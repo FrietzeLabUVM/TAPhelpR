@@ -10,13 +10,13 @@ License: What license is it under?
 Encoding: UTF-8
 LazyData: true
 Depends: 
-  ggplot2
+  ggplot2,
+  data.table
 Imports: 
-  data.table,
   GenomicRanges,
   IRanges,
   openxlsx,
   reshape2,
   S4Vectors,
   seqsetvis (>= 1.15.7)
-RoxygenNote: 7.2.2
+RoxygenNote: 7.2.3

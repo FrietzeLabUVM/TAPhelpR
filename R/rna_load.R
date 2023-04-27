@@ -35,7 +35,10 @@ locate_files = function(wd, pattern){
   files = locate_files(wd, pattern)
   dt = data.table::data.table(file = files)
   if(!is.null(var_map)){
-    dt[, names(var_map) := data.table::tstrsplit(basename(file), "[_\\.]", keep = var_map)]
+    # dt[, names(var_map) := data.table::tstrsplit(basename(file), "[_\\.]", keep = var_map)]
+    data.table::set(dt, j = names(var_map), value = data.table::tstrsplit(basename(dt$file), "[_\\.]", keep = var_map))
+    # dt[, c(names(var_map)) := data.table::tstrsplit(basename(file), "[_\\.]", keep = var_map)]
+    # dt[, `:=`(names(var_map), data.table::tstrsplit(basename(file), "[_\\.]", keep = var_map))]
   }
   dt[]
 }
