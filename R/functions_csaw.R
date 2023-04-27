@@ -1,4 +1,4 @@
-#' make_make_contrasts
+#' make_contrasts
 #'
 #' @param config_df Data.frame containing metadata with grouping variables for
 #'   differential analysis.
@@ -15,8 +15,8 @@
 #' cfg_df = read.table(cfg_file, sep = ",", header = TRUE)
 #' cfg_df = subset(cfg_df, mark == "H3K27ac")
 #' cfg_df
-#' make_make_contrasts(cfg_df, groups_var = "background", vary_var = "treatment")
-make_make_contrasts = function(config_df, groups_var = "cell", vary_var = "treatment"){
+#' make_contrasts(cfg_df, groups_var = "background", vary_var = "treatment")
+make_contrasts = function(config_df, groups_var = "cell", vary_var = "treatment"){
   stopifnot(is.data.frame(config_df))
   config_df = as.data.frame(config_df)
   vars = c(groups_var, vary_var)
