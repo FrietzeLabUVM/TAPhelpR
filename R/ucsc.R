@@ -1,11 +1,23 @@
-config_file = "/slipstream/home/joeboyd/lab_shared/data/SF_SE_data"
-config_file = "/slipstream/home/joeboyd/R_workspace.combined/chiptsne_projects/zhang_IK_SE/config_zhang_IK_SE.csv"
-pipeline_outputs_dir = "/slipstream/home/joeboyd/lab_shared/data/SF_SE_data"
-pipeline_outputs_dir = "/slipstream/home/joeboyd/R_workspace.combined/chiptsne_projects/zhang_IK_SE/output"
 
 
-c("fe", "nu", "ns", "ru", "rs")
-
+#' stage_output_for_UCSC_tracks
+#'
+#' @param pipeline_outputs_dir
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' config_file = "/slipstream/home/joeboyd/lab_shared/data/SF_SE_data"
+#' config_file = "/slipstream/home/joeboyd/R_workspace.combined/chiptsne_projects/zhang_IK_SE/config_zhang_IK_SE.csv"
+#' pipeline_outputs_dir = "/slipstream/home/joeboyd/lab_shared/data/SF_SE_data"
+#' pipeline_outputs_dir = "/slipstream/home/joeboyd/R_workspace.combined/chiptsne_projects/zhang_IK_SE/output"
+#'
+#'
+#' c("fe", "nu", "ns", "ru", "rs")
+#'
+#' stage_output_for_UCSC_tracks("/slipstream/home/joeboyd/R_workspace.combined/chiptsne_projects/zhang_IK_SE/output")
+#' stage_output_for_UCSC_tracks("/slipstream/home/joeboyd/lab_shared/data/SF_SE_data")
 stage_output_for_UCSC_tracks = function(pipeline_outputs_dir){
   bw_outs = dir(pipeline_outputs_dir, pattern = "bigwigs$", full.names = TRUE)
   bw_files.fe = dir(pipeline_outputs_dir, pattern = "FE.bw$", full.names = TRUE)
@@ -22,8 +34,7 @@ stage_output_for_UCSC_tracks = function(pipeline_outputs_dir){
   message(paste(valid_groups, collapse = " "))
   message(paste(valid_short, collapse = " "))
 }
-stage_output_for_UCSC_tracks("/slipstream/home/joeboyd/R_workspace.combined/chiptsne_projects/zhang_IK_SE/output")
-stage_output_for_UCSC_tracks("/slipstream/home/joeboyd/lab_shared/data/SF_SE_data")
+
 
 stage_rnaseq_for_UCSC = function(){
 
