@@ -35,12 +35,6 @@ data.table/data.frame
 wide matrix of RNA counts
 }
 \description{
-locate_files
-
-Creates data.table/data.frame with file paths and associated metadata.
-
-Creates data.table/data.frame with file paths and associated metadata.
-
 Creates data.table/data.frame with file paths and associated metadata.
 }
 \examples{

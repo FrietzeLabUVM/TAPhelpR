@@ -43,6 +43,8 @@ locate_files = function(wd, pattern){
   dt[]
 }
 
+#' setup_bam_files
+#'
 #' Creates data.table/data.frame with file paths and associated metadata.
 #'
 #' @return data.table/data.frame
@@ -59,7 +61,22 @@ locate_files = function(wd, pattern){
 #' #usage of var_map
 #' setup_bam_files(wd, var_map = c("cell" = 1, "temp" = 2, "rep" = 3))
 setup_bam_files = function(wd, var_map = NULL){
-  dt = .setup_files(wd, ".bam$", var_map)
+  dt = .setup_files(wd, "Aligned.sortedByCoord.out.bam$", var_map)
+  dt[, mapped_reads := get_mapped_reads(file), .(file)]
+  dt[]
+}
+
+#' setup_bam_files.transcriptome
+#'
+#' @param wd
+#' @param var_map
+#'
+#' @return
+#' @export
+#'
+#' @examples
+setup_bam_files.transcriptome = function(wd, var_map = NULL){
+  dt = .setup_files(wd, "Aligned.toTranscriptome.out.bam$", var_map)
   dt[, mapped_reads := get_mapped_reads(file), .(file)]
   dt[]
 }
