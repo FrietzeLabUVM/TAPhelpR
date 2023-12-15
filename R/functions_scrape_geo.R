@@ -61,7 +61,7 @@ readLines.recursive = function(url, wait = .5){
   lines
 }
 
-#' scrape_geo
+#' GEO_get_file_info
 #'
 #'
 #' Characteristics
@@ -75,7 +75,7 @@ readLines.recursive = function(url, wait = .5){
 #' @import curl
 #' @examples
 #' my_gse = "GSE86897"
-#' gse_dt = scrape_geo(my_gse)
+#' gse_dt = GEO_get_file_info(my_gse)
 #' gse_dt
 #' stopifnot(!any(duplicated(gse_dt$title)))
 #' dump_script = system.file("extdata/fasterq_dump_wrapper.sh", package = "TAPhelpR", mustWork = TRUE)
@@ -111,15 +111,15 @@ readLines.recursive = function(url, wait = .5){
 #' writeLines(
 #' sapply(fetch_cmds, system),
 #' "submit_fetch_zhange.sh")
-scrape_geo = function(GSE_id,
-                      gsm_override = NULL,
-                      gsm_todo = NULL,
-                      gsm_skip = NULL,
-                      do_srr = TRUE,
-                      debug = FALSE,
-                      chara = c("cancer type", "cell type", "genotype", "passages", "antibody"),
-                      key_str = c("Title", rep("Characteristics", length(chara))),
-                      key_idx = append(list(5), chara)){
+GEO_get_file_info = function(GSE_id,
+                             gsm_override = NULL,
+                             gsm_todo = NULL,
+                             gsm_skip = NULL,
+                             do_srr = TRUE,
+                             debug = FALSE,
+                             chara = c("cancer type", "cell type", "genotype", "passages", "antibody"),
+                             key_str = c("Title", rep("Characteristics", length(chara))),
+                             key_idx = append(list(5), chara)){
   stopifnot(length(key_str) == length(key_idx))
 
 
@@ -196,7 +196,14 @@ scrape_geo = function(GSE_id,
   return(dt)
 }
 
-submit_sra_fetch = function(srr_tofetch, fastq_prefixes, out_dir = getwd(), docker = NULL, singularity = NULL){
+GEO_download_files = function(srr_tofetch, fastq_prefixes, out_dir = getwd(), docker = NULL, singularity = NULL){
+  all_cmds = .create_sra_fetch_cmds(srr_tofetch, fastq_prefixes, out_dir, docker, singularity)
+  sapply(all_cmds, function(cmd){
+    system(paste("sbatch", cmd))
+  })
+}
+
+.create_sra_fetch_cmds = function(srr_tofetch, fastq_prefixes, out_dir = getwd(), docker = NULL, singularity = NULL){
   dump_script = system.file("extdata/fasterq_dump_wrapper.sh", package = "TAPhelpR", mustWork = TRUE)
   stopifnot(length(srr_tofetch) == length(fastq_prefixes))
   stopifnot(!any(duplicated(srr_tofetch)))

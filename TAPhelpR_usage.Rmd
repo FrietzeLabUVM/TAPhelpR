@@ -1,0 +1,50 @@
+---
+title: "TAPhelpR_usage"
+author: "Joe Boyd"
+date: "2023-12-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## TAPhelpR
+
+**TAPhelpR** is intended to help prepare to run **TAP** and then evaluate and use the outputs.
+
+Prior to running **TAP**
+
+1. Generating a config file
+2. Validating the config file
+3. Fetching public data from GEO and ENCODE
+
+After running **TAP**
+
+1. Evaluating completeness of outputs
+2. Running suppa2 diffSplice
+3. Preparing count matrix for DESeq2 and other analyses
+4. Generating UCSC track config files
+
+## Config Files
+
+Generating a config: work in progress
+
+Validating a config file.
+
+```{r pressure, echo=FALSE}
+cfgs = dir("~/lab_shared/scripts/TAP/testing/test_configs/", full.names = TRUE)
+cfgs = cfgs[!grepl("chip", cfgs)]
+names(cfgs) = basename(cfgs)
+cfgs = as.list(cfgs)
+#'
+test_dir = "/slipstream/home/joeboyd/lab_shared/scripts/TAP/testing"
+cmd_extra = paste("-i", file.path(test_dir, "test_data/fastq_rnaseq_PE"), "-ref", file.path(test_dir, "references/dm6"))
+pool_cfg = cfgs$test_dm6_config.pool.csv
+# when you invoke TAP
+config_validate(pool_cfg, extra_args = cmd_extra)
+```
+
+Note the output of the above is a data.frame with fastq files as the rownames and the _/. delimited name elements split. This also allows you to verify that your names are well formed. Well formed names have the same number of elements. Poorly formed names will make downstream analysis more painful as you'll constantly have to add additional code to handle these inconsistencies.
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
