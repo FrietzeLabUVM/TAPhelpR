@@ -8,3 +8,8 @@ qc_values.csv
 test_*
 config_zhang_IK_SE.csv
 KF_data
+ENCFF001VWI.bed.gz
+ENCFF397TYS.fastq.gz
+ENCFF791NEQ.fastq.gz
+suppa2_diff
+suppa2_output

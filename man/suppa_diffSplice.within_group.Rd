@@ -6,7 +6,8 @@
 \usage{
 suppa_diffSplice.within_group(
   input_files,
-  by,
+  within_group,
+  between_group,
   ref_location,
   joinFiles_output_location = "suppa2_output",
   PSI_todo = unlist(SPLICE_EVENTS),
@@ -17,10 +18,6 @@ suppa_diffSplice.within_group(
 \item{input_files}{Paths to either .bam files or .salmon_quant directories in
 a TAP output directory. See details for alternative formats and interaction
 with other parameters.}
-
-\item{by}{Only used when input_files is a data.frame. Must be a character
-vector of attributes in input_files. Values of these attributes are used to
-split input_files into groups to join.}
 
 \item{ref_location}{Location of SUPPA2 directory in TAP reference.}
 
@@ -33,6 +30,10 @@ event types.}
 
 \item{diffSplice_output_location}{Location to write output files to. Same as joinFiles_output_location if not
 specified.}
+
+\item{by}{Only used when input_files is a data.frame. Must be a character
+vector of attributes in input_files. Values of these attributes are used to
+split input_files into groups to join.}
 }
 \value{
 The output location is invisibly returned.

@@ -196,11 +196,17 @@ GEO_get_file_info = function(GSE_id,
   return(dt)
 }
 
-GEO_download_files = function(srr_tofetch, fastq_prefixes, out_dir = getwd(), docker = NULL, singularity = NULL){
+GEO_download_files = function(srr_tofetch, fastq_prefixes, out_dir = getwd(), docker = NULL, singularity = NULL, bash_or_sbatch = "sbatch", return_commands = FALSE){
   all_cmds = .create_sra_fetch_cmds(srr_tofetch, fastq_prefixes, out_dir, docker, singularity)
-  sapply(all_cmds, function(cmd){
-    system(paste("sbatch", cmd))
-  })
+  if(return_commands){
+    sapply(all_cmds, function(cmd){
+      paste(bash_or_sbatch, cmd)
+    })
+  }else{
+    sapply(all_cmds, function(cmd){
+      system(paste(bash_or_sbatch, cmd))
+    })
+  }
 }
 
 .create_sra_fetch_cmds = function(srr_tofetch, fastq_prefixes, out_dir = getwd(), docker = NULL, singularity = NULL){

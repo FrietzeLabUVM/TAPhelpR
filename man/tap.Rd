@@ -9,9 +9,11 @@ load_counts(
   lib_type = NULL,
   name_composition = NULL,
   just_check_library_type = FALSE,
-  use_gene_name = TRUE,
   gtf_file = NULL
 )
+}
+\arguments{
+\item{gtf_file}{}
 }
 \value{
 wide matrix of RNA counts

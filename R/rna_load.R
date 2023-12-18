@@ -100,6 +100,12 @@ setup_count_files = function(wd, var_map = NULL){
 
 #' Creates data.table/data.frame with file paths and associated metadata.
 #'
+#' @param wd
+#' @param lib_type
+#' @param name_composition
+#' @param just_check_library_type
+#' @param gtf_file
+#'
 #' @return wide matrix of RNA counts
 #' @export
 #' @rdname tap
@@ -112,8 +118,8 @@ setup_count_files = function(wd, var_map = NULL){
 #' wd = "/slipstream_old/home/joeboyd/R_workspace/SFtapfly.data"
 #' load_counts(wd)
 #' load_counts(wd, name_composition = c(1, 2, 3, 4))
-load_counts = function(wd, lib_type = NULL, name_composition = NULL, just_check_library_type = FALSE, use_gene_name = TRUE, gtf_file = NULL){
-
+load_counts = function(wd, lib_type = NULL, name_composition = NULL, just_check_library_type = FALSE, gtf_file = NULL){
+  use_gene_name = ifelse(is.null(gtf_file), FALSE, TRUE)
   if(is.null(name_composition)){
     setup_var_map = NULL
   }else{

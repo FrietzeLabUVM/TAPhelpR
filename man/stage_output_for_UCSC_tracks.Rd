@@ -4,7 +4,7 @@
 \alias{stage_output_for_UCSC_tracks}
 \title{stage_output_for_UCSC_tracks}
 \usage{
-stage_output_for_UCSC_tracks(pipeline_outputs_dir)
+stage_output_for_UCSC_tracks(pipeline_outputs_dir, track_hosting_dir)
 }
 \arguments{
 \item{pipeline_outputs_dir}{}

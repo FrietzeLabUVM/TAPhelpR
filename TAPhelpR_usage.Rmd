@@ -6,29 +6,52 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
 ```
 
-## TAPhelpR
+# TAPhelpR
 
 **TAPhelpR** is intended to help prepare to run **TAP** and then evaluate and use the outputs.
 
 Prior to running **TAP**
 
-1. Generating a config file
-2. Validating the config file
-3. Fetching public data from GEO and ENCODE
+1. [Generating a config file (WIP)](#generate-config)
+2. [Validating the config file](#validate-config)
+3. Fetching public data from [GEO](#geo) and [ENCODE](#encode)
 
 After running **TAP**
 
-1. Evaluating completeness of outputs
-2. Running suppa2 diffSplice
-3. Preparing count matrix for DESeq2 and other analyses
-4. Generating UCSC track config files
+1. [Evaluating completeness of outputs (WIP)](#evaluate-completeness)
+2. [Running suppa2 diffSplice](#run-suppa2-diffsplice)
+3. [Preparing count matrix for DESeq2 and other analyses](#counts-and-deseq2)
+4. [Generating UCSC track config files](#ucsc-tracks)
 
-## Config Files
+## Installation
+
+```{r, eval = FALSE}
+if(!require("devtools")){
+  install.packages("devtools")
+}
+# This dependency has fallen out of Bioconductor :(
+devtools::install_github("CharlesJB/ENCODExplorer")
+devtools::install_github("FrietzeLabUVM/TAPhelpR")
+
+```
+
+```{r}
+library(TAPhelpR)
+library(tidyverse)
+```
+
+# Before Running TAP
+
+## Configs
+
+### Generate Config
 
 Generating a config: work in progress
+
+### Validate Config
 
 Validating a config file.
 
@@ -47,4 +70,139 @@ config_validate(pool_cfg, extra_args = cmd_extra)
 
 Note the output of the above is a data.frame with fastq files as the rownames and the _/. delimited name elements split. This also allows you to verify that your names are well formed. Well formed names have the same number of elements. Poorly formed names will make downstream analysis more painful as you'll constantly have to add additional code to handle these inconsistencies.
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## Fetch Public Data
+
+### ENCODE
+
+You will need the [ENCODExplorer package installed](#installation).
+
+Fetching data consists of 2 steps. Retrieving file information from ENCODE as a data.frame. This data.frame must then be filtered and used to derive file names. Once this is done, the data.frame is used to fetch or download the specified files.
+
+```{r encode_info}
+enc_df = ENCODE_get_file_info(request_organisms = "Homo sapiens", request_target_chipseq = "IKZF1")
+enc_df.fe_bw = subset(enc_df, file_format == "bigWig" & output_type == "fold change over control" & assembly == "GRCh38")
+enc_df.fe_bw = dplyr::mutate(
+  enc_df.fe_bw,
+  rep = ifelse(grepl(";", biological_replicates), "pooled", biological_replicates)
+)
+DT::datatable(enc_df.fe_bw)
+```
+
+```{r encode_fetch, eval = FALSE}
+# you must set file_name on the input data.frame
+enc_df.fe_bw = dplyr::mutate(
+  enc_df.fe_bw,
+  file_name = paste(sep = "_",
+                    biosample_name,
+                    target, 
+                    rep,
+                    file_accession, 
+                    "FE.bw"
+  )
+)
+ENCODE_download_files(enc_df.fe_bw)
+```
+### GEO
+
+Retrieving data from GEO follows the same pattern as getting files from ENCODE except that you start with a valid GEO series accession number, i.e. GSE####.
+
+```{r geo_info, eval=FALSE}
+# you need the GSE accession
+gse_df = GEO_get_file_info("GSE152028")
+# you typically need to do some cleanup from the title
+gse_df = dplyr::mutate(
+  gse_df,
+  name = sub(" \\+ ", "&", title)
+)
+gse_df = dplyr::mutate(
+  gse_df,
+  name = sub(" - ", " ", name)
+)
+gse_df = dplyr::mutate(
+  gse_df,
+  name = sub("input_DNA", "input", name)
+)
+gse_df$name = gsub(" +", "_", gse_df$name)
+gse_df$name = paste0(gse_df$name, ".", gse_df$srr)
+```
+
+```{r geo_fetch, eval=FALSE}
+GEO_download_files(gse_df$srr, fastq_prefixes = gse_df$name, singularity = "tap_latest.sif", bash_or_sbatch = "bash")
+```
+
+# After running TAP
+
+```{r TAP_setup_files}
+tap_out = "~/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output"
+bam_files = setup_bam_files(tap_out, var_map = c("day", "sex", "rep"))
+```
+
+TAPhelpR contains several setup_*_files functions to create a convenient data.frame containing file paths and meta data.
+
+The generic equivalent of the above looks like this:
+
+```{r TAP_setup_files2}
+setup_files(tap_out, pattern = "sortedByCoord.out.bam$", var_map = c("day", "sex", "rep"))
+```
+
+## Evaluate completeness
+
+WIP
+
+## Run suppa2 diffSplice
+
+```{r suppa2_join, eval=FALSE}
+suppa_joinFiles(bam_files, by = "sex")
+```
+
+```{r suppa2_diff, eval=FALSE}
+suppa_diffSplice(
+  ref_location = "~/lab_shared/indexes/honeybee",
+  PSI_todo = TAP_SPLICE_EVENTS$SkippingExon)
+```
+
+```{r suppa2_diff_group, eval=FALSE}
+suppa_diffSplice.within_group(
+  input_files = bam_files,
+  within_group = "day",
+  between_group = "sex",
+  ref_location = "~/lab_shared/indexes/honeybee",
+  PSI_todo = TAP_SPLICE_EVENTS$SkippingExon)
+```
+
+```{r suppa2_cluster, eval=FALSE}
+suppa_clusterEvents(PSI_todo = TAP_SPLICE_EVENTS$SkippingExon)
+```
+
+## Counts and DESeq2
+
+```{r, load_counts}
+mat = load_counts(tap_out)
+head(mat)
+```
+
+```{r, load_counts_gene_name, eval=FALSE}
+#if you supply the reference gtf file, or GRanges of same, to load_counts, gene_ids in counts will be aggregated to gene_name
+mat.gene_name = load_counts(tap_out, gtf_file = "indexes/honeybee/GTF/current.gft")
+```
+
+```{r deseq2}
+library(DESeq2)
+meta_df = bam_files
+meta_df$file = NULL
+meta_df = dplyr::mutate(meta_df, name = paste(day, sex, rep, sep = "_"))
+des = DESeqDataSetFromMatrix(mat[, meta_df$name], colData = meta_df, design = ~sex)
+# and run from there ...
+```
+
+## UCSC tracks
+
+```{r, ucsc}
+stage_output_for_UCSC_tracks(tap_out, track_hosting_dir = "~/public_files/honeybee")
+"~/public_files/honeybee" %>% 
+  dir(full.names = TRUE) %>% 
+  dir(full.names = TRUE) %>% 
+  sample(size = 6)
+```
+
+launch shiny app
