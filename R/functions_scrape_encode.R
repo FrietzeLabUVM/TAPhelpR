@@ -19,6 +19,11 @@ ENCODE_get_file_info = function(request_organisms = NULL,
                             request_cell_lines = NULL,
                             request_target_chipseq = NULL,
                             request_file_types = NULL){
+  if (!requireNamespace("ENCODExplorer", quietly = TRUE)) {
+    warning("The ENCODExplorer package must be installed to use this functionality")
+    #Either exit or do something without rgl
+    return(NULL)
+  }
   dt = ENCODExplorer::queryEncode(
     organism = request_organisms,
     biosample_name = request_cell_lines,
@@ -48,6 +53,11 @@ ENCODE_get_file_info = function(request_organisms = NULL,
 #' dt[, .(file_name)]
 #' ENCODE_download_files(dt)
 ENCODE_download_files = function(dt, output_location = getwd()){
+  if (!requireNamespace("ENCODExplorer", quietly = TRUE)) {
+    warning("The ENCODExplorer package must be installed to use this functionality")
+    #Either exit or do something without rgl
+    return(NULL)
+  }
   if(is.null(dt$file_name)){
     stop("You must set file_name attribute in input dt.")
   }
