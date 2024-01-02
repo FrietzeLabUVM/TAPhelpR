@@ -29,7 +29,7 @@
 
 library(TAPhelpR)
 tap_out = "~/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output"
-bam_files = setup_bam_files(tap_out, var_map = c("day", "sex", "rep"))
+bam_files = setup_bam_files(tap_out, variable_map = c("day", "sex", "rep"))
 
 suppa_joinFiles(bam_files, by = "sex")
 suppa_diffSplice(

@@ -6,6 +6,19 @@
 \usage{
 load_gene_reference(gtf_file)
 }
+\value{
+A GRanges object that can be supplied as \code{gtf_file} for other TAPhelpR functions.
+}
 \description{
-load_gene_reference
+Loads gene reference from the same .gtf file used to run TAP. The result of this function can be input for \code{gtf_file} to any function with that parameter to avoid loading the same reference repeatedly.
+}
+\details{
+Only the gene entries are loaded by this function. Use \link{load_exon_reference} if you require exon information.
+}
+\examples{
+ref_dir = example_honeybee_reference()
+gtf_file = file.path(ref_dir, "GTF/current.gtf")
+load_gene_reference(gtf_file)
+# for simplicity you can just specify the base path to the reference used to run TAP.
+load_gene_reference(ref_dir)
 }

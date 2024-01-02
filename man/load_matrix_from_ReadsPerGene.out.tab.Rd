@@ -4,11 +4,22 @@
 \alias{load_matrix_from_ReadsPerGene.out.tab}
 \title{load_matrix_from_ReadsPerGene.out.tab}
 \usage{
-load_matrix_from_ReadsPerGene.out.tab(files, lib_type = "guess")
+load_matrix_from_ReadsPerGene.out.tab(files, library_type = "guess")
 }
 \arguments{
-\item{lib_type}{}
+\item{files}{Count files output by STAR.}
+
+\item{library_type}{Strandedness of library. Should be one of "guess", "unstranded", "first", or "second". Default is "guess" and will result in attempting to automatically detect and apply library type.}
+}
+\value{
+A matrix containing raw read counts for each file in files.
 }
 \description{
 load_matrix_from_ReadsPerGene.out.tab
+}
+\examples{
+tap_out = "~/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output"
+count_files = setup_count_files(tap_out, variable_map = c("day", "sex", "rep"))
+mat = load_matrix_from_ReadsPerGene.out.tab(count_files$file)
+head(mat)
 }

@@ -6,14 +6,22 @@
 \usage{
 load_counts(
   work_dir,
-  lib_type = NULL,
+  library_type = NULL,
   name_composition = NULL,
   just_check_library_type = FALSE,
   gtf_file = NULL
 )
 }
 \arguments{
-\item{gtf_file}{}
+\item{work_dir}{Path to TAP output directory}
+
+\item{library_type}{Strandedness of library. Should be one of "guess", "unstranded", "first", or "second". Default is "guess" and will result in attempting to automatically detect and apply library type.}
+
+\item{name_composition}{Used to extract column names for final count matrix from basename of count files. Should be a vector of numbers defining positions in _ and/or . delimited basename. For instance, name_composition = c(1, 3) on a basename of donor1_august_liver.siteA would yield a column name of donor1_liver.}
+
+\item{just_check_library_type}{If TRUE, counts will not be loaded into a matrix and instead a vector of library type guesses will be returned. For a more detailed look at individual libraries use \link{guess_lib_from_file} with show_plots = TRUE.}
+
+\item{gtf_file}{Supply to convert gene_ids to gene_names (HGNC gene symbols). Either a path to a gtf file or GRanges object loaded from one with \link{load_gene_reference} or \link[rtracklayer:GFFFile-class]{rtracklayer::import.gff}.  The "gene_id" attribute will be matched to "gene_name" and aggregated by sum if required.}
 }
 \value{
 wide matrix of RNA counts

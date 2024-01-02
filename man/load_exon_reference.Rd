@@ -6,6 +6,19 @@
 \usage{
 load_exon_reference(gtf_file)
 }
+\value{
+A GRanges object with exonic information.
+}
 \description{
-load_exon_reference
+Loads exon reference from the same .gtf file used to run TAP.
+}
+\details{
+This loads all exon entries  which is the most detail possibled. Use \link{load_gene_reference} if you only need basic gene information.
+}
+\examples{
+ref_dir = example_honeybee_reference()
+gtf_file = file.path(ref_dir, "GTF/current.gtf")
+load_exon_reference(gtf_file)
+# for simplicity you can just specify the base path to the reference used to run TAP.
+load_exon_reference(ref_dir)
 }

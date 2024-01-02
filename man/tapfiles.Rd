@@ -8,39 +8,39 @@
 \alias{setup_count_files}
 \title{setup_files}
 \usage{
-setup_files(work_dir, pattern, var_map = NULL)
+setup_files(work_dir, pattern, variable_map = NULL)
 
-setup_bam_files(work_dir, var_map = NULL)
+setup_bam_files(work_dir, variable_map = NULL)
 
-setup_bam_files.transcriptome(work_dir, var_map = NULL)
+setup_bam_files.transcriptome(work_dir, variable_map = NULL)
 
-setup_peak_files(work_dir, var_map = NULL)
+setup_peak_files(work_dir, variable_map = NULL)
 
-setup_count_files(work_dir, var_map = NULL)
+setup_count_files(work_dir, variable_map = NULL)
 }
 \arguments{
 \item{work_dir}{Path to TAP output directory}
 
 \item{pattern}{File pattern to match (.bam, .samon_quant, .ReadsPerGene.out.tab, etc)}
 
-\item{var_map}{Variables that can be extracted from file names. File names are assumed to be delimitted by "_" and/or ".". See details.}
+\item{variable_map}{Variables that can be extracted from file names. File names are assumed to be delimitted by "_" and/or ".". See details.}
 }
 \value{
 data.table/data.frame
 
-\code{var_map} encodes how metadata variables can be extracted from file names returned by matching the \code{pattern} in \code{work_dir}.
+\code{variable_map} encodes how metadata variables can be extracted from file names returned by matching the \code{pattern} in \code{work_dir}.
 
 Let's use 6d_queen_A.Aligned.sortedByCoord.out.bam as an example file.
 
-\code{var_map = c("day", "sex", "rep")} would extract 6d, queen, and A into columns "day", "sex", and "rep" respectively.
+\code{variable_map = c("day", "sex", "rep")} would extract 6d, queen, and A into columns "day", "sex", and "rep" respectively.
 
 If you need to be more specific you could do:
 
-\code{var_map = c("sex" = 2)} which would extract only the second item into column "sex".
+\code{variable_map = c("sex" = 2)} which would extract only the second item into column "sex".
 
 Using this specification type we can get the same result as the first exmaple with:
 
-\code{var_map = c("day" = 1, "sex" = 2, "rep" = 3)}
+\code{variable_map = c("day" = 1, "sex" = 2, "rep" = 3)}
 }
 \description{
 Creates data.table/data.frame with file paths and associated metadata.
@@ -48,8 +48,8 @@ Creates data.table/data.frame with file paths and associated metadata.
 \examples{
 work_dir = "/slipstream_old/home/joeboyd/R_workspace/SFtapfly.data"
 setup_bam_files(work_dir)
-#usage of var_map
-setup_bam_files(work_dir, var_map = c("cell" = 1, "temp" = 2, "rep" = 3))
+#usage of variable_map
+setup_bam_files(work_dir, variable_map = c("cell" = 1, "temp" = 2, "rep" = 3))
 # general form
-setup_bam_files(work_dir, var_map = c("cell" = 1, "temp" = 2, "rep" = 3), pattern = 'Aligned.sortedByCoord.out.bam$')
+setup_bam_files(work_dir, variable_map = c("cell" = 1, "temp" = 2, "rep" = 3), pattern = 'Aligned.sortedByCoord.out.bam$')
 }

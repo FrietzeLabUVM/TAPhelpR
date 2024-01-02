@@ -54,3 +54,25 @@ set_suppa_path = function(suppa_path){
   invisible(TRUE)
 }
 
+
+#' example_honeybee_output
+#'
+#' @return Path to example TAP output
+#' @export
+#'
+#' @examples
+#' example_honeybee_output()
+example_honeybee_output = function(){
+  "~/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output"
+}
+
+#' example_honeybee_reference
+#'
+#' @return Path to example TAP reference
+#' @export
+#'
+#' @examples
+#' example_honeybee_reference()
+example_honeybee_reference = function(){
+  "/slipstream/home/joeboyd/indexes/honeybee"
+}

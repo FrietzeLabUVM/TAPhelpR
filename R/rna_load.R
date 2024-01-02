@@ -21,42 +21,42 @@ get_mapped_reads = function(bam_file){
 #'
 #' @param work_dir Path to TAP output directory
 #' @param pattern File pattern to match (.bam, .samon_quant, .ReadsPerGene.out.tab, etc)
-#' @param var_map Variables that can be extracted from file names. File names are assumed to be delimitted by "_" and/or ".". See details.
+#' @param variable_map Variables that can be extracted from file names. File names are assumed to be delimitted by "_" and/or ".". See details.
 #'
 #' @return data.table/data.frame
 #'
-#' `var_map` encodes how metadata variables can be extracted from file names returned by matching the `pattern` in `work_dir`.
+#' `variable_map` encodes how metadata variables can be extracted from file names returned by matching the `pattern` in `work_dir`.
 #'
 #'  Let's use 6d_queen_A.Aligned.sortedByCoord.out.bam as an example file.
 #'
-#'  `var_map = c("day", "sex", "rep")` would extract 6d, queen, and A into columns "day", "sex", and "rep" respectively.
+#'  `variable_map = c("day", "sex", "rep")` would extract 6d, queen, and A into columns "day", "sex", and "rep" respectively.
 #'
 #'  If you need to be more specific you could do:
 #'
-#'  `var_map = c("sex" = 2)` which would extract only the second item into column "sex".
+#'  `variable_map = c("sex" = 2)` which would extract only the second item into column "sex".
 #'
 #'  Using this specification type we can get the same result as the first exmaple with:
 #'
-#'  `var_map = c("day" = 1, "sex" = 2, "rep" = 3)`
+#'  `variable_map = c("day" = 1, "sex" = 2, "rep" = 3)`
 #'
 #' @rawNamespace import(data.table, except = c(shift, first, second, last, melt))
 #' @export
 #' @rdname tapfiles
 #' @import ggplot2
 #' @import GenomicRanges
-setup_files = function(work_dir, pattern, var_map = NULL){
+setup_files = function(work_dir, pattern, variable_map = NULL){
   files = dir(work_dir, pattern = pattern, full.names = TRUE)
   dt = data.table::data.table(file = files)
-  if(!is.null(var_map)){
-    if(is.character(var_map)){
-      tmp = seq_along(var_map)
-      names(tmp) = var_map
-      var_map = tmp
+  if(!is.null(variable_map)){
+    if(is.character(variable_map)){
+      tmp = seq_along(variable_map)
+      names(tmp) = variable_map
+      variable_map = tmp
     }
-    # dt[, names(var_map) := data.table::tstrsplit(basename(file), "[_\\.]", keep = var_map)]
-    data.table::set(dt, j = names(var_map), value = data.table::tstrsplit(basename(dt$file), "[_\\.]", keep = var_map))
-    # dt[, c(names(var_map)) := data.table::tstrsplit(basename(file), "[_\\.]", keep = var_map)]
-    # dt[, `:=`(names(var_map), data.table::tstrsplit(basename(file), "[_\\.]", keep = var_map))]
+    data.table::set(dt, j = names(variable_map), value = data.table::tstrsplit(basename(dt$file), "[_\\.]", keep = variable_map))
+    if(!"name" %in% names(variable_map)){
+      data.table::set(dt, j = "name", value = apply(dt[, names(variable_map), with = FALSE], 1, paste, collapse = "_"))
+    }
   }
   dt[]
 }
@@ -68,43 +68,43 @@ setup_files = function(work_dir, pattern, var_map = NULL){
 #' @examples
 #' work_dir = "/slipstream_old/home/joeboyd/R_workspace/SFtapfly.data"
 #' setup_bam_files(work_dir)
-#' #usage of var_map
-#' setup_bam_files(work_dir, var_map = c("cell" = 1, "temp" = 2, "rep" = 3))
+#' #usage of variable_map
+#' setup_bam_files(work_dir, variable_map = c("cell" = 1, "temp" = 2, "rep" = 3))
 #' # general form
-#' setup_bam_files(work_dir, var_map = c("cell" = 1, "temp" = 2, "rep" = 3), pattern = 'Aligned.sortedByCoord.out.bam$')
-setup_bam_files = function(work_dir, var_map = NULL){
-  dt = setup_files(work_dir, "Aligned.sortedByCoord.out.bam$", var_map)
+#' setup_bam_files(work_dir, variable_map = c("cell" = 1, "temp" = 2, "rep" = 3), pattern = 'Aligned.sortedByCoord.out.bam$')
+setup_bam_files = function(work_dir, variable_map = NULL){
+  dt = setup_files(work_dir, "Aligned.sortedByCoord.out.bam$", variable_map)
   dt[, mapped_reads := get_mapped_reads(file), .(file)]
   dt[]
 }
 
 #' @export
 #' @rdname tapfiles
-setup_bam_files.transcriptome = function(work_dir, var_map = NULL){
-  dt = setup_files(work_dir, "Aligned.toTranscriptome.out.bam$", var_map)
+setup_bam_files.transcriptome = function(work_dir, variable_map = NULL){
+  dt = setup_files(work_dir, "Aligned.toTranscriptome.out.bam$", variable_map)
   dt[, mapped_reads := get_mapped_reads(file), .(file)]
   dt[]
 }
 
 #' @export
 #' @rdname tapfiles
-setup_peak_files = function(work_dir, var_map = NULL){
-  setup_files(work_dir, ".narrowPeak$", var_map)
+setup_peak_files = function(work_dir, variable_map = NULL){
+  setup_files(work_dir, ".narrowPeak$", variable_map)
 }
 
 #' @export
 #' @rdname tapfiles
-setup_count_files = function(work_dir, var_map = NULL){
-  setup_files(work_dir, ".ReadsPerGene.out.tab$", var_map)
+setup_count_files = function(work_dir, variable_map = NULL){
+  setup_files(work_dir, ".ReadsPerGene.out.tab$", variable_map)
 }
 
 #' Creates data.table/data.frame with file paths and associated metadata.
 #'
-#' @param work_dir
-#' @param lib_type
-#' @param name_composition
-#' @param just_check_library_type
-#' @param gtf_file
+#' @param work_dir Path to TAP output directory
+#' @param library_type Strandedness of library. Should be one of "guess", "unstranded", "first", or "second". Default is "guess" and will result in attempting to automatically detect and apply library type.
+#' @param name_composition Used to extract column names for final count matrix from basename of count files. Should be a vector of numbers defining positions in _ and/or . delimited basename. For instance, name_composition = c(1, 3) on a basename of donor1_august_liver.siteA would yield a column name of donor1_liver.
+#' @param just_check_library_type If TRUE, counts will not be loaded into a matrix and instead a vector of library type guesses will be returned. For a more detailed look at individual libraries use [guess_lib_from_file] with show_plots = TRUE.
+#' @param gtf_file Supply to convert gene_ids to gene_names (HGNC gene symbols). Either a path to a gtf file or GRanges object loaded from one with [load_gene_reference] or [rtracklayer::import.gff].  The "gene_id" attribute will be matched to "gene_name" and aggregated by sum if required.
 #'
 #' @return wide matrix of RNA counts
 #' @export
@@ -118,7 +118,7 @@ setup_count_files = function(work_dir, var_map = NULL){
 #' work_dir = "/slipstream_old/home/joeboyd/R_workspace/SFtapfly.data"
 #' load_counts(work_dir)
 #' load_counts(work_dir, name_composition = c(1, 2, 3, 4))
-load_counts = function(work_dir, lib_type = NULL, name_composition = NULL, just_check_library_type = FALSE, gtf_file = NULL){
+load_counts = function(work_dir, library_type = NULL, name_composition = NULL, just_check_library_type = FALSE, gtf_file = NULL){
   use_gene_name = ifelse(is.null(gtf_file), FALSE, TRUE)
   if(is.null(name_composition)){
     setup_var_map = NULL
@@ -127,7 +127,16 @@ load_counts = function(work_dir, lib_type = NULL, name_composition = NULL, just_
     var_names = paste0("var", seq_along(name_composition))
     names(setup_var_map) = var_names
   }
-  dt = setup_count_files(work_dir, var_map = setup_var_map)
+  if(is.data.frame(work_dir)){
+    if(!is.null(name_composition)){
+      stop("name_composition is not allowed when work_dir is a data.frame.")
+    }
+    if(!all(c("file", "name") %in% colnames(work_dir))){
+      dt = work_dir
+    }
+  }else{
+    dt = setup_count_files(work_dir, variable_map = setup_var_map)
+  }
   if(is.null(name_composition)){
     dt$name = sub(".ReadsPerGene.out.tab", "", basename(dt$file))
   }else{
@@ -145,15 +154,15 @@ load_counts = function(work_dir, lib_type = NULL, name_composition = NULL, just_
   if(any(duplicated(names(toload)))){
     names(toload) = paste0(names(toload), "_", table(names(toload)))
   }
-  if(is.null(lib_type)){
-    lib_type = unique(sapply(dt$file, guess_lib_from_file))
-    if(length(lib_type) > 1){
-      stop("Multiple potential library types detected: ", paste(lib_type, collapse = ", "),
-           "\nUse TAPhelpR::guess_lib_from_file to investigate and then run load_counts() again but manually specify lib_type.")
+  if(is.null(library_type) | library_type == "guess"){
+    library_type = unique(sapply(dt$file, guess_lib_from_file))
+    if(length(library_type) > 1){
+      stop("Multiple potential library types detected: ", paste(library_type, collapse = ", "),
+           "\nUse TAPhelpR::guess_lib_from_file to investigate and then run load_counts() again but manually specify library_type.")
     }
   }
-  message("Loading all files using library type: ", lib_type)
-  mat = load_matrix_from_ReadsPerGene.out.tab(dt$file, lib_type = lib_type)
+  message("Loading all files using library type: ", library_type)
+  mat = load_matrix_from_ReadsPerGene.out.tab(dt$file, library_type = library_type)
   colnames(mat) = dt$name
   if(use_gene_name){
     mat = aggregate_by_gene_name(mat, gtf_file = gtf_file)
@@ -168,10 +177,10 @@ load_counts = function(work_dir, lib_type = NULL, name_composition = NULL, just_
 #'
 #' @examples
 #' load_norm_counts()
-load_norm_counts = function(work_dir, lib_type = NULL, name_composition = NULL, just_check_library_type = FALSE, gtf_file = NULL){
+load_norm_counts = function(work_dir, library_type = NULL, name_composition = NULL, just_check_library_type = FALSE, gtf_file = NULL){
   raw_counts = load_counts(
     work_dir = work_dir,
-    lib_type = lib_type,
+    library_type = library_type,
     name_composition = name_composition,
     just_check_library_type = just_check_library_type,
     gtf_file = gtf_file
@@ -194,24 +203,52 @@ load_norm_counts = function(work_dir, lib_type = NULL, name_composition = NULL, 
 
 #' load_gene_reference
 #'
-#' @return
+#' Loads gene reference from the same .gtf file used to run TAP. The result of this function can be input for `gtf_file` to any function with that parameter to avoid loading the same reference repeatedly.
+#'
+#' Only the gene entries are loaded by this function. Use [load_exon_reference] if you require exon information.
+#'
+#' @return A GRanges object that can be supplied as `gtf_file` for other TAPhelpR functions.
 #' @export
 #'
 #' @examples
+#' ref_dir = example_honeybee_reference()
+#' gtf_file = file.path(ref_dir, "GTF/current.gtf")
+#' load_gene_reference(gtf_file)
+#' # for simplicity you can just specify the base path to the reference used to run TAP.
+#' load_gene_reference(ref_dir)
 load_gene_reference = function(gtf_file){
-  ref_gr = rtracklayer::import.gff(gtf_file, feature.type = "gene")
+  .load_ref(gtf_file, "gene")
+}
+
+.load_ref = function(gtf_file, feature_type){
+  if(dir.exists(gtf_file)){
+    if(file.exists(file.path(gtf_file, "GTF/current.gtf"))){
+      gtf_file = file.path(gtf_file, "GTF/current.gtf")
+    }
+  }
+  if(!file.exists(gtf_file)){
+    stop("gtf_file could not be found. Use the same reference directory used to run TAP or the gtf located at GTF/current.gtf in that same reference.")
+  }
+  ref_gr = rtracklayer::import.gff(gtf_file, feature.type = feature_type)
   names(ref_gr) = ref_gr$gene_id
   ref_gr
 }
 
 #' load_exon_reference
 #'
-#' @return
+#' Loads exon reference from the same .gtf file used to run TAP.
+#'
+#' This loads all exon entries  which is the most detail possibled. Use [load_gene_reference] if you only need basic gene information.
+#'
+#' @return A GRanges object with exonic information.
 #' @export
 #'
 #' @examples
+#' ref_dir = example_honeybee_reference()
+#' gtf_file = file.path(ref_dir, "GTF/current.gtf")
+#' load_exon_reference(gtf_file)
+#' # for simplicity you can just specify the base path to the reference used to run TAP.
+#' load_exon_reference(ref_dir)
 load_exon_reference = function(gtf_file){
-  ref_gr = rtracklayer::import.gff(gtf_file, feature.type = "exon")
-  names(ref_gr) = ref_gr$gene_id
-  ref_gr
+  .load_ref(gtf_file, "exon")
 }

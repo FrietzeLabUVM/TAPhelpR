@@ -1,21 +1,24 @@
 #' make_tidy_from_matrix
 #'
-#' @param wide_matrix
+#' @param wide_matrix A wide matrix of count data with samples as columns and genes as rows
+#' @param value_name Name for value attribute, i.e. "count".
+#' @param row_name Name for row attribute, i.e. "gene_id".
+#' @param column_name Name for column attribute, i.e. "name".
 #'
-#' @return
+#' @return A tidy data.table representation of input wide matrix
 #' @export
 #'
 #' @examples
-make_tidy_from_matrix = function(wide_matrix){
+#' mat = matrix(1:9, ncol = 3, byrow = TRUE)
+#' rownames(mat) = paste("gene", seq(nrow(mat)), sep = "_")
+#' colnames(mat) = paste("sample", seq(ncol(mat)), sep = "_")
+#' dt = make_tidy_from_matrix(mat)
+#' dt
+make_tidy_from_matrix = function(wide_matrix, value_name = "count", row_name = "gene_id", column_name = "name"){
   dt = data.table::as.data.table(reshape2::melt(wide_matrix))
-  colnames(dt) = c("gene_id", "sample", "count")
-  if(any(grepl("rep", dt$sample))){
-    dt[, c("cell", "rep") := data.table::tstrsplit(sample, "[_ ]")]
-  }else{
-    dt[, c("cell") := data.table::tstrsplit(sample, "[_ ]")]
-  }
-  dt = .add_name_and_group.no_treat(dt)
-  dt
+  colnames(dt) = c(row_name, column_name, value_name)
+  # dt = .add_name_and_group.no_treat(dt)
+  dt[]
 }
 
 guess_lib = function(dt_stats,
@@ -46,16 +49,20 @@ guess_lib = function(dt_stats,
 
 #' guess_lib_from_file
 #'
-#' @param f
-#' @param show_plots
-#' @param miss_cutoff
-#' @param hit_cutoff
-#' @param split_cutoff
+#' Determines that library strandedness based on ratio of first to unstranded and second to unstranded.
 #'
-#' @return
+#' @param f count file to guess library type from.
+#' @param show_plots if TRUE, diagnostic plots will be output to graphics device.
+#' @param miss_cutoff Max allowed ratio of strand sensitive to unstranded. If strand is over this, it can't be that strand.
+#' @param hit_cutoff Min allowed ratio of strand sensitive to unstranded. If strand is under this, it can't be that strand.
+#' @param split_cutoff If both are over this ratio, it's unstranded.
+#'
+#' @return One of "unrecognized", "first", "second", or "unstranded" indicating library strandedness.
 #' @export
 #'
 #' @examples
+#' count_files = setup_count_files(example_honeybee_output())
+#' guess_lib_from_file(count_files$file[1])
 guess_lib_from_file = function(f,
                                show_plots = FALSE,
                                miss_cutoff = 1.2,
@@ -69,7 +76,7 @@ guess_lib_from_file = function(f,
     geom_bar(stat = "identity") +
     facet_wrap(~gene_id, scales = "free_y") +
     scale_y_continuous(labels = function(x)paste(x/1e6, "M")) +
-    labs(title = "Problematic reads per strandedness lib_type")
+    labs(title = "Problematic reads per strandedness library_type")
 
   dt_genes = dt[!grepl("N_", gene_id)]
   tdt_genes = reshape2::melt(dt_genes, variable.name = "lib", value.name = "count", id.vars = "gene_id")
@@ -78,7 +85,7 @@ guess_lib_from_file = function(f,
   if(show_plots){
     p_genes = ggplot(tdt_genes, aes(x = lib, y = log10(count+1))) +
       geom_boxplot() +
-      labs(title = "Reads mapped to genes per strandedness lib_type")
+      labs(title = "Reads mapped to genes per strandedness library_type")
 
     plot(
       cowplot::plot_grid(ncol = 1, rel_heights = c(1, 12),
@@ -98,27 +105,39 @@ guess_lib_from_file = function(f,
 
 #' load_matrix_from_ReadsPerGene.out.tab
 #'
-#' @param files
-#' @param lib_type
+#' @param files Count files output by STAR.
+#' @param library_type Strandedness of library. Should be one of "guess", "unstranded", "first", or "second". Default is "guess" and will result in attempting to automatically detect and apply library type.
 #'
-#' @return
+#' @return A matrix containing raw read counts for each file in files.
 #' @export
 #'
 #' @examples
-load_matrix_from_ReadsPerGene.out.tab = function(files, lib_type = "guess"){
-  stopifnot(lib_type %in% c("guess", "unstranded", "first", "second"))
-  if(lib_type == "guess"){
+#' tap_out = "~/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output"
+#' count_files = setup_count_files(tap_out, variable_map = c("day", "sex", "rep"))
+#' mat = load_matrix_from_ReadsPerGene.out.tab(count_files$file)
+#' head(mat)
+load_matrix_from_ReadsPerGene.out.tab = function(files, library_type = "guess"){
+  stopifnot(library_type %in% c("guess", "unstranded", "first", "second"))
+  if(is.data.frame(files)){
+    if(!all(c("file", "name") %in% colnames(files))){
+      stop("`files` must be either a named character vector or a data.frame containing variables 'file' and 'name'")
+    }
+    tmp = files$file
+    names(tmp) = files$name
+    file = tmp
+  }
+  if(library_type == "guess"){
     test_files = head(files)
     guesses = unique(sapply(files, guess_lib_from_file))
     if(length(guesses) > 1){
-      stop("could not uniquely guess library type, please determine using guess_lib_from_file and manually specify lib_type.")
+      stop("could not uniquely guess library type, please determine using guess_lib_from_file and manually specify library_type.")
     }
-    lib_type = guesses
+    library_type = guesses
   }
-  stopifnot(lib_type %in% c("unstranded", "first", "second"))
+  stopifnot(library_type %in% c("unstranded", "first", "second"))
 
   message("loading files...")
-  dtl = pbmcapply::pbmclapply(files, mc.cores = 20, load_ReadsPerGene.out.tab, lib_type = lib_type)
+  dtl = pbmcapply::pbmclapply(files, mc.cores = 20, load_ReadsPerGene.out.tab, library_type = library_type)
 
   message("assembling matrix...")
   mat = matrix(0, nrow = nrow(dtl[[1]]), ncol = length(dtl))
@@ -133,17 +152,17 @@ load_matrix_from_ReadsPerGene.out.tab = function(files, lib_type = "guess"){
   mat
 }
 
-load_ReadsPerGene.out.tab = function(f, lib_type){
-  stopifnot(lib_type %in% c("unstranded", "first", "second"))
+load_ReadsPerGene.out.tab = function(f, library_type){
+  stopifnot(library_type %in% c("unstranded", "first", "second"))
   obs_lib = guess_lib_from_file(f)
-  if(obs_lib != lib_type){
-    warning("file ", f, " had lib_type of ", obs_lib, ', not ', lib_type, " as expected.")
+  if(obs_lib != library_type){
+    warning("file ", f, " had library_type of ", obs_lib, ', not ', library_type, " as expected.")
   }
 
   dt = data.table::fread(f, col.names = c("gene_id", "unstranded", "first", "second"))
 
   dt_genes = dt[!grepl("N_", gene_id)]
-  dt_genes = dt_genes[, c("gene_id", lib_type), with = FALSE]
+  dt_genes = dt_genes[, c("gene_id", library_type), with = FALSE]
   colnames(dt_genes)[2] = sub(".ReadsPerGene.out.tab", "", basename(f))
   dt_genes
 }

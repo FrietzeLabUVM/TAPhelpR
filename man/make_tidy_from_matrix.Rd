@@ -4,11 +4,32 @@
 \alias{make_tidy_from_matrix}
 \title{make_tidy_from_matrix}
 \usage{
-make_tidy_from_matrix(wide_matrix)
+make_tidy_from_matrix(
+  wide_matrix,
+  value_name = "count",
+  row_name = "gene_id",
+  column_name = "name"
+)
 }
 \arguments{
-\item{wide_matrix}{}
+\item{wide_matrix}{A wide matrix of count data with samples as columns and genes as rows}
+
+\item{value_name}{Name for value attribute, i.e. "count".}
+
+\item{row_name}{Name for row attribute, i.e. "gene_id".}
+
+\item{column_name}{Name for column attribute, i.e. "name".}
+}
+\value{
+A tidy data.table representation of input wide matrix
 }
 \description{
 make_tidy_from_matrix
+}
+\examples{
+mat = matrix(1:9, ncol = 3, byrow = TRUE)
+rownames(mat) = paste("gene", seq(nrow(mat)), sep = "_")
+colnames(mat) = paste("sample", seq(ncol(mat)), sep = "_")
+dt = make_tidy_from_matrix(mat)
+dt
 }

@@ -13,8 +13,23 @@ guess_lib_from_file(
 )
 }
 \arguments{
-\item{split_cutoff}{}
+\item{f}{count file to guess library type from.}
+
+\item{show_plots}{if TRUE, diagnostic plots will be output to graphics device.}
+
+\item{miss_cutoff}{Max allowed ratio of strand sensitive to unstranded. If strand is over this, it can't be that strand.}
+
+\item{hit_cutoff}{Min allowed ratio of strand sensitive to unstranded. If strand is under this, it can't be that strand.}
+
+\item{split_cutoff}{If both are over this ratio, it's unstranded.}
+}
+\value{
+One of "unrecognized", "first", "second", or "unstranded" indicating library strandedness.
 }
 \description{
-guess_lib_from_file
+Determines that library strandedness based on ratio of first to unstranded and second to unstranded.
+}
+\examples{
+count_files = setup_count_files(example_honeybee_output())
+guess_lib_from_file(count_files$file[1])
 }

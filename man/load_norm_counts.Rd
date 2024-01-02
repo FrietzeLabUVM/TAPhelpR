@@ -6,7 +6,7 @@
 \usage{
 load_norm_counts(
   work_dir,
-  lib_type = NULL,
+  library_type = NULL,
   name_composition = NULL,
   just_check_library_type = FALSE,
   gtf_file = NULL
