@@ -58,8 +58,8 @@ providing a list.
 }
 }
 \examples{
-wd = "/slipstream/home/dbgap/data/alignment_RNA-Seq/"
-bam_files = find_bam_files(wd)
+work_dir = "/slipstream/home/dbgap/data/alignment_RNA-Seq/"
+bam_files = find_bam_files(work_dir)
 input_files = bam_files[1:5]
 suppa_joinFiles(input_files, "test")
 

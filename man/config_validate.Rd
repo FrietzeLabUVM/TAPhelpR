@@ -4,7 +4,7 @@
 \alias{config_validate}
 \title{Validate config file for running TAP on RNAseq}
 \usage{
-config_validate(config_file, extra_args = NULL, wd = NULL)
+config_validate(config_file, extra_args = NULL, work_dir = NULL)
 }
 \arguments{
 \item{config_file}{A configuration file for TAP.}
@@ -25,16 +25,16 @@ test_dir = "/slipstream/home/joeboyd/lab_shared/scripts/TAP/testing"
 cmd_extra = paste("-i", file.path(test_dir, "test_data/fastq_rnaseq_PE"), "-ref", file.path(test_dir, "references/dm6"))
 config_validate(cfgs$test_dm6_config.basic.csv, extra_args = cmd_extra)
 
-config_validate(cfgs$test_dm6_config.basic.csv, wd = "~/lab_shared/scripts/TAP/testing/test_data/fastq_rnaseq_PE/")
+config_validate(cfgs$test_dm6_config.basic.csv, work_dir = "~/lab_shared/scripts/TAP/testing/test_data/fastq_rnaseq_PE/")
 
-config_validate(cfgs$test_dm6_config.params.csv, wd = "~/lab_shared/scripts/TAP")
+config_validate(cfgs$test_dm6_config.params.csv, work_dir = "~/lab_shared/scripts/TAP")
 
-config_validate(cfgs$test_dm6_config.pool.csv, wd = "~/lab_shared/scripts/TAP/testing/test_data/fastq_rnaseq_PE/")
+config_validate(cfgs$test_dm6_config.pool.csv, work_dir = "~/lab_shared/scripts/TAP/testing/test_data/fastq_rnaseq_PE/")
 
-config_validate(cfgs$test_dm6_config.rDNA_only.csv, wd = "~/lab_shared/scripts/TAP")
+config_validate(cfgs$test_dm6_config.rDNA_only.csv, work_dir = "~/lab_shared/scripts/TAP")
 
-config_validate(cfgs$test_dm6_config.rename.csv, wd = "~/lab_shared/scripts/TAP/testing/test_data/fastq_rnaseq_PE/")
+config_validate(cfgs$test_dm6_config.rename.csv, work_dir = "~/lab_shared/scripts/TAP/testing/test_data/fastq_rnaseq_PE/")
 
-config_validate(cfgs$test_dm6_config.SE.csv, wd = "~/lab_shared/scripts/TAP")
+config_validate(cfgs$test_dm6_config.SE.csv, work_dir = "~/lab_shared/scripts/TAP")
 
 }

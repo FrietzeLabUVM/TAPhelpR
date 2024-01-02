@@ -19,13 +19,13 @@ get_mapped_reads = function(bam_file){
 #'
 #' Creates data.table/data.frame with file paths and associated metadata.
 #'
-#' @param wd Path to TAP output directory
+#' @param work_dir Path to TAP output directory
 #' @param pattern File pattern to match (.bam, .samon_quant, .ReadsPerGene.out.tab, etc)
 #' @param var_map Variables that can be extracted from file names. File names are assumed to be delimitted by "_" and/or ".". See details.
 #'
 #' @return data.table/data.frame
 #'
-#' `var_map` encodes how metadata variables can be extracted from file names returned by matching the `pattern` in `wd`.
+#' `var_map` encodes how metadata variables can be extracted from file names returned by matching the `pattern` in `work_dir`.
 #'
 #'  Let's use 6d_queen_A.Aligned.sortedByCoord.out.bam as an example file.
 #'
@@ -44,8 +44,8 @@ get_mapped_reads = function(bam_file){
 #' @rdname tapfiles
 #' @import ggplot2
 #' @import GenomicRanges
-setup_files = function(wd, pattern, var_map = NULL){
-  files = dir(wd, pattern = pattern, full.names = TRUE)
+setup_files = function(work_dir, pattern, var_map = NULL){
+  files = dir(work_dir, pattern = pattern, full.names = TRUE)
   dt = data.table::data.table(file = files)
   if(!is.null(var_map)){
     if(is.character(var_map)){
@@ -66,41 +66,41 @@ setup_files = function(wd, pattern, var_map = NULL){
 #' @export
 #' @rdname tapfiles
 #' @examples
-#' wd = "/slipstream_old/home/joeboyd/R_workspace/SFtapfly.data"
-#' setup_bam_files(wd)
+#' work_dir = "/slipstream_old/home/joeboyd/R_workspace/SFtapfly.data"
+#' setup_bam_files(work_dir)
 #' #usage of var_map
-#' setup_bam_files(wd, var_map = c("cell" = 1, "temp" = 2, "rep" = 3))
+#' setup_bam_files(work_dir, var_map = c("cell" = 1, "temp" = 2, "rep" = 3))
 #' # general form
-#' setup_bam_files(wd, var_map = c("cell" = 1, "temp" = 2, "rep" = 3), pattern = 'Aligned.sortedByCoord.out.bam$')
-setup_bam_files = function(wd, var_map = NULL){
-  dt = setup_files(wd, "Aligned.sortedByCoord.out.bam$", var_map)
+#' setup_bam_files(work_dir, var_map = c("cell" = 1, "temp" = 2, "rep" = 3), pattern = 'Aligned.sortedByCoord.out.bam$')
+setup_bam_files = function(work_dir, var_map = NULL){
+  dt = setup_files(work_dir, "Aligned.sortedByCoord.out.bam$", var_map)
   dt[, mapped_reads := get_mapped_reads(file), .(file)]
   dt[]
 }
 
 #' @export
 #' @rdname tapfiles
-setup_bam_files.transcriptome = function(wd, var_map = NULL){
-  dt = setup_files(wd, "Aligned.toTranscriptome.out.bam$", var_map)
+setup_bam_files.transcriptome = function(work_dir, var_map = NULL){
+  dt = setup_files(work_dir, "Aligned.toTranscriptome.out.bam$", var_map)
   dt[, mapped_reads := get_mapped_reads(file), .(file)]
   dt[]
 }
 
 #' @export
 #' @rdname tapfiles
-setup_peak_files = function(wd, var_map = NULL){
-  setup_files(wd, ".narrowPeak$", var_map)
+setup_peak_files = function(work_dir, var_map = NULL){
+  setup_files(work_dir, ".narrowPeak$", var_map)
 }
 
 #' @export
 #' @rdname tapfiles
-setup_count_files = function(wd, var_map = NULL){
-  setup_files(wd, ".ReadsPerGene.out.tab$", var_map)
+setup_count_files = function(work_dir, var_map = NULL){
+  setup_files(work_dir, ".ReadsPerGene.out.tab$", var_map)
 }
 
 #' Creates data.table/data.frame with file paths and associated metadata.
 #'
-#' @param wd
+#' @param work_dir
 #' @param lib_type
 #' @param name_composition
 #' @param just_check_library_type
@@ -115,10 +115,10 @@ setup_count_files = function(wd, var_map = NULL){
 #' @import GenomicRanges
 #'
 #' @examples
-#' wd = "/slipstream_old/home/joeboyd/R_workspace/SFtapfly.data"
-#' load_counts(wd)
-#' load_counts(wd, name_composition = c(1, 2, 3, 4))
-load_counts = function(wd, lib_type = NULL, name_composition = NULL, just_check_library_type = FALSE, gtf_file = NULL){
+#' work_dir = "/slipstream_old/home/joeboyd/R_workspace/SFtapfly.data"
+#' load_counts(work_dir)
+#' load_counts(work_dir, name_composition = c(1, 2, 3, 4))
+load_counts = function(work_dir, lib_type = NULL, name_composition = NULL, just_check_library_type = FALSE, gtf_file = NULL){
   use_gene_name = ifelse(is.null(gtf_file), FALSE, TRUE)
   if(is.null(name_composition)){
     setup_var_map = NULL
@@ -127,7 +127,7 @@ load_counts = function(wd, lib_type = NULL, name_composition = NULL, just_check_
     var_names = paste0("var", seq_along(name_composition))
     names(setup_var_map) = var_names
   }
-  dt = setup_count_files(wd, var_map = setup_var_map)
+  dt = setup_count_files(work_dir, var_map = setup_var_map)
   if(is.null(name_composition)){
     dt$name = sub(".ReadsPerGene.out.tab", "", basename(dt$file))
   }else{
@@ -168,8 +168,14 @@ load_counts = function(wd, lib_type = NULL, name_composition = NULL, just_check_
 #'
 #' @examples
 #' load_norm_counts()
-load_norm_counts = function(wd, name_composition = NULL, use_gene_name = TRUE){
-  raw_counts = load_counts(use_gene_name = use_gene_name, name_composition = name_composition)
+load_norm_counts = function(work_dir, lib_type = NULL, name_composition = NULL, just_check_library_type = FALSE, gtf_file = NULL){
+  raw_counts = load_counts(
+    work_dir = work_dir,
+    lib_type = lib_type,
+    name_composition = name_composition,
+    just_check_library_type = just_check_library_type,
+    gtf_file = gtf_file
+  )
   # apply(raw_counts, 2, quantile, probs = .99)
   rpm_counts = apply(
     raw_counts,

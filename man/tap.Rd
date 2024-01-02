@@ -5,7 +5,7 @@
 \title{Creates data.table/data.frame with file paths and associated metadata.}
 \usage{
 load_counts(
-  wd,
+  work_dir,
   lib_type = NULL,
   name_composition = NULL,
   just_check_library_type = FALSE,
@@ -22,7 +22,7 @@ wide matrix of RNA counts
 Creates data.table/data.frame with file paths and associated metadata.
 }
 \examples{
-wd = "/slipstream_old/home/joeboyd/R_workspace/SFtapfly.data"
-load_counts(wd)
-load_counts(wd, name_composition = c(1, 2, 3, 4))
+work_dir = "/slipstream_old/home/joeboyd/R_workspace/SFtapfly.data"
+load_counts(work_dir)
+load_counts(work_dir, name_composition = c(1, 2, 3, 4))
 }

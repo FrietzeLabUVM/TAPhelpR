@@ -39,8 +39,8 @@ get_wrap_script = function(){
 #' @export
 #'
 #' @examples
-#' wd = "/slipstream/home/dbgap/data/alignment_RNA-Seq/"
-#' bam_files = find_bam_files(wd)
+#' work_dir = "/slipstream/home/dbgap/data/alignment_RNA-Seq/"
+#' bam_files = find_bam_files(work_dir)
 #' input_files = bam_files[1:5]
 #' suppa_joinFiles(input_files, "test")
 #'
@@ -154,12 +154,12 @@ suppa_joinFiles.list = function(input_files,
   }
 }
 
-get_tpm_files = function(wd){
-  dir(wd, pattern = ".tpm$", full.names = TRUE)
+get_tpm_files = function(work_dir){
+  dir(work_dir, pattern = ".tpm$", full.names = TRUE)
 }
 
-get_psi_files = function(wd, psi){
-  dir(wd, pattern = paste0(psi, ".psi$"), full.names = TRUE)
+get_psi_files = function(work_dir, psi){
+  dir(work_dir, pattern = paste0(psi, ".psi$"), full.names = TRUE)
 }
 
 #' suppa_diffSplice
@@ -242,7 +242,16 @@ suppa_diffSplice = function(
 #' @export
 #'
 #' @examples
+#' tap_out = "~/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output"
+#' bam_files = setup_bam_files(tap_out, var_map = c("day", "sex", "rep"))
 #'
+#' suppa_diffSplice.within_group(
+#'   input_files = bam_files,
+#'   within_group = "day",
+#'   between_group = "sex",
+#'   ref_location = "~/lab_shared/indexes/honeybee",
+#'   PSI_todo = TAP_SPLICE_EVENTS$SkippingExon
+#' )
 suppa_diffSplice.within_group = function(
     input_files,
     within_group,

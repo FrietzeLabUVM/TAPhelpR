@@ -8,18 +8,18 @@
 \alias{setup_count_files}
 \title{setup_files}
 \usage{
-setup_files(wd, pattern, var_map = NULL)
+setup_files(work_dir, pattern, var_map = NULL)
 
-setup_bam_files(wd, var_map = NULL)
+setup_bam_files(work_dir, var_map = NULL)
 
-setup_bam_files.transcriptome(wd, var_map = NULL)
+setup_bam_files.transcriptome(work_dir, var_map = NULL)
 
-setup_peak_files(wd, var_map = NULL)
+setup_peak_files(work_dir, var_map = NULL)
 
-setup_count_files(wd, var_map = NULL)
+setup_count_files(work_dir, var_map = NULL)
 }
 \arguments{
-\item{wd}{Path to TAP output directory}
+\item{work_dir}{Path to TAP output directory}
 
 \item{pattern}{File pattern to match (.bam, .samon_quant, .ReadsPerGene.out.tab, etc)}
 
@@ -28,7 +28,7 @@ setup_count_files(wd, var_map = NULL)
 \value{
 data.table/data.frame
 
-\code{var_map} encodes how metadata variables can be extracted from file names returned by matching the \code{pattern} in \code{wd}.
+\code{var_map} encodes how metadata variables can be extracted from file names returned by matching the \code{pattern} in \code{work_dir}.
 
 Let's use 6d_queen_A.Aligned.sortedByCoord.out.bam as an example file.
 
@@ -46,10 +46,10 @@ Using this specification type we can get the same result as the first exmaple wi
 Creates data.table/data.frame with file paths and associated metadata.
 }
 \examples{
-wd = "/slipstream_old/home/joeboyd/R_workspace/SFtapfly.data"
-setup_bam_files(wd)
+work_dir = "/slipstream_old/home/joeboyd/R_workspace/SFtapfly.data"
+setup_bam_files(work_dir)
 #usage of var_map
-setup_bam_files(wd, var_map = c("cell" = 1, "temp" = 2, "rep" = 3))
+setup_bam_files(work_dir, var_map = c("cell" = 1, "temp" = 2, "rep" = 3))
 # general form
-setup_bam_files(wd, var_map = c("cell" = 1, "temp" = 2, "rep" = 3), pattern = 'Aligned.sortedByCoord.out.bam$')
+setup_bam_files(work_dir, var_map = c("cell" = 1, "temp" = 2, "rep" = 3), pattern = 'Aligned.sortedByCoord.out.bam$')
 }

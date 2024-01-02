@@ -41,3 +41,15 @@ The output location is invisibly returned.
 \description{
 suppa_diffSplice.within_group
 }
+\examples{
+tap_out = "~/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output"
+bam_files = setup_bam_files(tap_out, var_map = c("day", "sex", "rep"))
+
+suppa_diffSplice.within_group(
+  input_files = bam_files,
+  within_group = "day",
+  between_group = "sex",
+  ref_location = "~/lab_shared/indexes/honeybee",
+  PSI_todo = TAP_SPLICE_EVENTS$SkippingExon
+)
+}

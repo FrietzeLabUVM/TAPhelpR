@@ -16,6 +16,9 @@ GEO_get_file_info(
   key_idx = append(list(5), chara)
 )
 }
+\value{
+A data.table containing information on .fastq files available via SRA associated with GEO GSE series accession. Should used to call \link{GEO_download_files}.
+}
 \description{
 Characteristics
 cell type: stromal adherent pre-B cell progenitors

@@ -4,7 +4,13 @@
 \alias{load_norm_counts}
 \title{xeno_rna.load_norm_counts}
 \usage{
-load_norm_counts(wd, name_composition = NULL, use_gene_name = TRUE)
+load_norm_counts(
+  work_dir,
+  lib_type = NULL,
+  name_composition = NULL,
+  just_check_library_type = FALSE,
+  gtf_file = NULL
+)
 }
 \value{
 wide matrix of RNA counts, RPM normalized after trimming .01 quantile

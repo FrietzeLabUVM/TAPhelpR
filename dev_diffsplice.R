@@ -20,7 +20,7 @@
 #       match_files
 #     })
 #     ssvSplicing::suppa_diffSplice(
-#       wd = stage_dir,
+#       work_dir = stage_dir,
 #       ref_location = "/slipstream/home/joeboyd/indexes/honeybee/SUPPA2"
 #     )
 #   }
