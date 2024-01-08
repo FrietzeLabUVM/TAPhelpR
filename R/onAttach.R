@@ -54,6 +54,32 @@ set_suppa_path = function(suppa_path){
   invisible(TRUE)
 }
 
+example_honeybee_config = function(){
+  "/slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_input/config_tap.csv"
+}
+
+#' example_honeybee_input
+#'
+#' @return Path to example TAP output
+#' @export
+#'
+#' @examples
+#' example_honeybee_input()
+example_honeybee_input = function(){
+  "/slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_input"
+}
+
+#' example_honeybee_config
+#'
+#' @return Path to example TAP output
+#' @export
+#'
+#' @examples
+#' example_honeybee_config()
+example_honeybee_config = function(){
+  "/slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_input"
+}
+
 
 #' example_honeybee_output
 #'
@@ -63,7 +89,21 @@ set_suppa_path = function(suppa_path){
 #' @examples
 #' example_honeybee_output()
 example_honeybee_output = function(){
-  "~/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output"
+  "/slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output.rename"
+}
+
+#' exampple_honeybee_metadata
+#'
+#' @return data.frame with honeybee SRR metadata.
+#' @export
+#'
+#' @examples
+#' exampple_honeybee_metadata()
+example_honeybee_metadata = function(){
+  f = system.file(package = "TAPhelpR", "extdata/honeybee_meta.csv", mustWork = TRUE)
+  df = read.table(f, sep = ",")
+  colnames(df) = c("srr", "name")
+  df
 }
 
 #' example_honeybee_reference
@@ -74,5 +114,5 @@ example_honeybee_output = function(){
 #' @examples
 #' example_honeybee_reference()
 example_honeybee_reference = function(){
-  "/slipstream/home/joeboyd/indexes/honeybee"
+  "/slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_reference"
 }

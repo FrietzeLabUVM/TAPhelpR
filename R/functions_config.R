@@ -1,5 +1,136 @@
-config_create = function(){
+#' config_create
+#'
+#' @param inDir Directory with all .fastq.gz files. Default is current directory.
+#' @param f1_suffix Suffix of R1 files. Default is _R1_001.fastq.gz
+#' @param f2_suffix Suffix of R2 files. Default is _R2_001.fastq.gz. Only required if data is PE.
+#' @param outDir Output directory. Default is TAP_output in current directory.
+#' @param reference Parent directory for all reference directories. The location with output from setup_new_reference.sh
+#' @param starIndex Directory with STAR index files. Only required if `reference` is not provided or you wish to override.
+#' @param suppaRef Directory with suppa2 index files. Only required if `reference` is not provided or you wish to override.
+#' @param gtf File, gtf or gff, with gene annotation. Only required if `reference` is not provided or you wish to override.
+#' @param fasta Organism genomic sequence fasta. Only required if `reference` is not provided or you wish to override.
+#' @param rDNA_starIndex Directory with STAR index for rDNA. Only required if you wish to quantify rDNA read composition.
+#' @param PE Set TRUE if data is PE. RNAseq will default to PE.
+#' @param SE Set TRUE if data is SE. ChIPseq will default to SE.
+#' @param noSub Set TRUE if bash should be used for all commands in serial instead of sbatch.
+#' @param pipeline Pipeline script to use. Only required if submission script is not in the same directory as default of "rnaseq_pipeline.sh".
+#' @param jobDir Directory with all job scripts. Only required if submission script is not in the same directory as default of "deployed_job_scripts".
+#' @param scriptLocatio Deprecated. Don't use.
+#' @param docker If you want to use docker, docker image to use. i.e. jrboyd/tap after using "setup_scripts/pull_docker_image.sh"
+#' @param singularity If you want to use singularity, singularity .sif file to use. i.e. tap_latest.sif after using "setup_scripts/pull_singularity_image.sh"
+#'
+#' @return list of config lines and fastq lines
+#' @export
+#' @rdname config-write
+#'
+#' @examples
+#' cfg = config_create(
+#'   inDir = example_honeybee_input(),
+#'   f1_suffix = "_1.fastq.gz", f2_suffix = "_2.fastq.gz",
+#'   outDir = paste0(example_honeybee_output(), ".test2"),
+#'   singularity = "~/lab_shared/scripts/TAP/tap_latest.sif",
+#'   reference = example_honeybee_reference()
+#' )
+#' config_write(cfg, "test_config.csv")
+#' config_validate("test_config.csv")
+#'
+#' cfg_rename = config_create(
+#'   inDir = example_honeybee_input(),
+#'   f1_suffix = "_1.fastq.gz", f2_suffix = "_2.fastq.gz",
+#'   outDir = paste0(example_honeybee_output(), ".rename2"),
+#'   singularity = "~/lab_shared/scripts/TAP/tap_latest.sif",
+#'   reference = example_honeybee_reference()
+#' )
+#' cfg_fq = cfg_rename$fastq_lines
+#' colnames(cfg_fq) = c("file", "srr")
+#' meta_df = example_honeybee_metadata()
+#' cfg_fq = merge(meta_df, cfg_fq, by = "srr")
+#' cfg_fq = cfg_fq[, c("file", "name")]
+#' cfg_rename$fastq_lines = cfg_fq
+#'
+#' config_write(cfg_rename, "rename_config.csv")
+#' config_validate("rename_config.csv")
+config_create = function(
+    inDir = NULL,
+    f1_suffix = NULL,
+    f2_suffix = NULL,
+    outDir = NULL,
+    reference = NULL,
+    starIndex = NULL,
+    suppaRef = NULL,
+    gtf = NULL,
+    fasta = NULL,
+    rDNA_starIndex = NULL,
+    PE = NULL,
+    SE = NULL,
+    noSub = NULL,
+    pipeline = NULL,
+    jobDir = NULL,
+    scriptLocation = NULL,
+    docker = NULL,
+    singularity = NULL
+){
+  argg <- c(as.list(environment()))
+  #add a couple defaults that make sense
+  if(is.null(argg$inDir)){
+    argg$inDir = getwd()
+  }
+  if(is.null(argg$f1_suffix)){
+    argg$f1_suffix = "_R1_001.fastq.gz"
+  }
+  if(is.null(argg$f2_suffix)){
+    argg$f2_suffix = "_R2_001.fastq.gz"
+  }
 
+  found_fq = dir(argg$inDir, pattern = paste0(argg$f1_suffix, "$"))
+  if(length(found_fq) < 1){
+    warning("No fastq files found, check inDir and f1_suffix.\ninDir: ", argg$inDir,"\nf1_suffix: ", argg$f1_suffix)
+  }
+
+  argg
+  valid_args = character()
+  for(nam in names(argg)){
+    if(!is.null(argg[[nam]])){
+      #these 2 are simple flags
+      if(nam %in% c("PE", "SE", "noSub")){
+        valid_args = c(valid_args, paste0("--", nam))
+      }else{
+        valid_args = c(valid_args, paste0("--", nam, " ", argg[[nam]]))
+      }
+    }
+  }
+  cfg_lines = paste("#CFG", valid_args)
+  fq_names = sub(argg$f1_suffix, "", basename(found_fq))
+  # fq_lines = paste(found_fq, fq_names, sep = ",")
+  fq_lines = data.frame(file = found_fq, name = fq_names)
+  message(paste(cfg_lines, collapse = "\n"))
+  list(config_lines = cfg_lines, fastq_lines = fq_lines)
+}
+
+#' config_write
+#'
+#' Use with output from [config_create]. Modify fastq names as necessary.
+#'
+#' @param config_list list returned from [config_create]
+#' @param config_file file to write configuration to, a specialized .csv format.
+#' @param overwrite If TRUE, existing config file will be overwritted. Default is FALSE.
+#'
+#' @return path to configuration file.
+#' @export
+#'
+#' @rdname config-write
+#'
+config_write = function(config_list, config_file, overwrite = FALSE){
+  stopifnot(setequal(names(config_list), c("config_lines", "fastq_lines")))
+  if(!overwrite){
+    stopifnot(!file.exists(config_file))
+  }
+
+  line1 = paste("# written by TAPhelpR version", packageDescription("TAPhelpR")$Version, "on", date())
+  fq_header = "# fastq file, sample name"
+  writeLines(c(line1, config_list$config_lines, fq_header), config_file)
+  write.table(config_list$fastq_lines, config_file, append = TRUE, sep = ",", col.names = FALSE, row.names = FALSE, quote = FALSE)
+  config_file
 }
 
 get_header_args = function(){
@@ -54,7 +185,8 @@ parse_head_str = function(head_str){
     # message(v_arg)
     possible_keys = header_args$value_args[[v_arg]]
     for(v_key in possible_keys){
-      arg_match = grepl(v_key, head_args)
+      # arg_match = grepl(v_key, head_args)
+      arg_match = v_key == head_args
       if(any(arg_match)){
         if(is.null(parsed_args[[v_arg]])){
           # value follows key by one position
@@ -106,7 +238,12 @@ parse_header = function(config_file){
       cfg_params[[nam]] = override_params[[nam]]
     }
   }
-
+  # if primary reference location is not specified then all other references must be
+  if(!"reference" %in% names(cfg_params)){
+    if(!all(c("starIndex", "suppaRef", 'gtf', "fasta") %in% names(cfg_params))){
+      stop("When reference is not specified then starIndex, suppaRef, gtf, and fasta must be specified.")
+    }
+  }
   must_exist = c("inDir", 'reference', "jobDir", "reference", "starIndex", "suppaRef", "gtf", "fasta", "rDNA_starIndex", "pipeline", "scriptLocation", "singularity")
   for(param in must_exist){
     if(!is.null(cfg_params[[param]])){
@@ -192,29 +329,7 @@ parse_header = function(config_file){
 #'
 #' @return A data.frame with the metadata elements parsed for each found fastq file.
 #' @export
-#'
-#' @examples
-#' cfgs = dir("~/lab_shared/scripts/TAP/testing/test_configs/", full.names = TRUE)
-#' cfgs = cfgs[!grepl("chip", cfgs)]
-#' names(cfgs) = basename(cfgs)
-#' cfgs = as.list(cfgs)
-#'
-#' test_dir = "/slipstream/home/joeboyd/lab_shared/scripts/TAP/testing"
-#' cmd_extra = paste("-i", file.path(test_dir, "test_data/fastq_rnaseq_PE"), "-ref", file.path(test_dir, "references/dm6"))
-#' config_validate(cfgs$test_dm6_config.basic.csv, extra_args = cmd_extra)
-#'
-#' config_validate(cfgs$test_dm6_config.basic.csv, work_dir = "~/lab_shared/scripts/TAP/testing/test_data/fastq_rnaseq_PE/")
-#'
-#' config_validate(cfgs$test_dm6_config.params.csv, work_dir = "~/lab_shared/scripts/TAP")
-#'
-#' config_validate(cfgs$test_dm6_config.pool.csv, work_dir = "~/lab_shared/scripts/TAP/testing/test_data/fastq_rnaseq_PE/")
-#'
-#' config_validate(cfgs$test_dm6_config.rDNA_only.csv, work_dir = "~/lab_shared/scripts/TAP")
-#'
-#' config_validate(cfgs$test_dm6_config.rename.csv, work_dir = "~/lab_shared/scripts/TAP/testing/test_data/fastq_rnaseq_PE/")
-#'
-#' config_validate(cfgs$test_dm6_config.SE.csv, work_dir = "~/lab_shared/scripts/TAP")
-#'
+#' @rdname config-write
 config_validate = function(config_file, extra_args = NULL, work_dir = NULL){
   old_wd = getwd()
   if(!is.null(work_dir)){
