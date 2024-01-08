@@ -154,7 +154,10 @@ load_counts = function(work_dir, library_type = NULL, name_composition = NULL, j
   if(any(duplicated(names(toload)))){
     names(toload) = paste0(names(toload), "_", table(names(toload)))
   }
-  if(is.null(library_type) | library_type == "guess"){
+  if(is.null(library_type)){
+    library_type = "guess"
+  }
+  if(library_type == "guess"){
     library_type = unique(sapply(dt$file, guess_lib_from_file))
     if(length(library_type) > 1){
       stop("Multiple potential library types detected: ", paste(library_type, collapse = ", "),
