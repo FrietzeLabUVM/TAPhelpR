@@ -92,6 +92,17 @@ example_honeybee_output = function(){
   "/slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output.rename"
 }
 
+#' example_honeybee_output.in_progress
+#'
+#' @return Path to example TAP output
+#' @export
+#'
+#' @examples
+#' example_honeybee_output.in_progress()
+example_honeybee_output.in_progress = function(){
+  system.file(package = "TAPhelpR", "extdata/honeybee_TAP_output.logs_in_progress", mustWork = TRUE)
+}
+
 #' exampple_honeybee_metadata
 #'
 #' @return data.frame with honeybee SRR metadata.

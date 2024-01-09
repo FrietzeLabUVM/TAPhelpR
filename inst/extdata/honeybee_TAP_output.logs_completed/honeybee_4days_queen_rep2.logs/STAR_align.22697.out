@@ -1,0 +1,24 @@
+/slipstream_old/slurm/spool/slurmd/job22697/slurm_script -f1 /slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_input/SRR3123380_1.fastq.gz -wd /slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output.rename -idx /slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_reference/STAR_INDEX -o honeybee_4days_queen_rep2 -f1s _1.fastq.gz -f2s _2.fastq.gz --singularity /slipstream/home/joeboyd/lab_shared/scripts/TAP/tap_latest.sif
+read1 fastq is /slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_input/SRR3123380_1.fastq.gz
+read2 fastq is /slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_input/SRR3123380_2.fastq.gz
+output prefix is /slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output.rename/honeybee_4days_queen_rep2
+STAR index is /slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_reference/STAR_INDEX
+docker is 
+singularity is /slipstream/home/joeboyd/lab_shared/scripts/TAP/tap_latest.sif
+singularity F1 is /input/SRR3123380_1.fastq.gz
+singularity F2 is /input/SRR3123380_2.fastq.gz
+singularity B is /output/honeybee_4days_queen_rep2
+singularity star_idx is /reference/STAR_INDEX
+singularity exec     --bind /slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_input:/input,/slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output.rename:/output,/slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_reference/STAR_INDEX:/reference/STAR_INDEX     /slipstream/home/joeboyd/lab_shared/scripts/TAP/tap_latest.sif     STAR      --runThreadN 16 --readFilesIn /input/SRR3123380_1.fastq.gz /input/SRR3123380_2.fastq.gz --readFilesCommand gunzip -c --genomeDir /reference/STAR_INDEX --outFilterMultimapNmax 20 --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 --outFilterMismatchNmax 999 --outFilterMismatchNoverReadLmax 0.04 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --outFileNamePrefix /output/honeybee_4days_queen_rep2.  --outSAMtype BAM Unsorted --quantMode TranscriptomeSAM GeneCounts --twopassMode Basic --outSAMstrandField intronMotif 
+
+	/usr/local/bin/STAR --runThreadN 16 --readFilesIn /input/SRR3123380_1.fastq.gz /input/SRR3123380_2.fastq.gz --readFilesCommand gunzip -c --genomeDir /reference/STAR_INDEX --outFilterMultimapNmax 20 --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 --outFilterMismatchNmax 999 --outFilterMismatchNoverReadLmax 0.04 --alignIntronMin 20 --alignIntronMax 1000000 --alignMatesGapMax 1000000 --outFileNamePrefix /output/honeybee_4days_queen_rep2. --outSAMtype BAM Unsorted --quantMode TranscriptomeSAM GeneCounts --twopassMode Basic --outSAMstrandField intronMotif
+	STAR version: 2.7.10b   compiled: 2023-10-02T17:30:50+00:00 :/STAR-2.7.10b/source
+Jan 05 15:26:52 ..... started STAR run
+Jan 05 15:26:53 ..... loading genome
+Jan 05 15:26:55 ..... started 1st pass mapping
+Jan 05 15:34:25 ..... finished 1st pass mapping
+Jan 05 15:34:25 ..... inserting junctions into the genome indices
+Jan 05 15:34:53 ..... started mapping
+Jan 05 15:47:02 ..... finished mapping
+Jan 05 15:47:03 ..... finished successfully
+FINISHED

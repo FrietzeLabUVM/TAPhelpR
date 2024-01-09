@@ -105,6 +105,7 @@ setup_count_files = function(work_dir, variable_map = NULL){
 #' @param name_composition Used to extract column names for final count matrix from basename of count files. Should be a vector of numbers defining positions in _ and/or . delimited basename. For instance, name_composition = c(1, 3) on a basename of donor1_august_liver.siteA would yield a column name of donor1_liver.
 #' @param just_check_library_type If TRUE, counts will not be loaded into a matrix and instead a vector of library type guesses will be returned. For a more detailed look at individual libraries use [guess_lib_from_file] with show_plots = TRUE.
 #' @param gtf_file Supply to convert gene_ids to gene_names (HGNC gene symbols). Either a path to a gtf file or GRanges object loaded from one with [load_gene_reference] or [rtracklayer::import.gff].  The "gene_id" attribute will be matched to "gene_name" and aggregated by sum if required.
+#' @param name_attribute The attribute in the gtf file to which gene_ids should be aggregated. Default of "gene_name" mostly works but some gtfs use "gene".
 #'
 #' @return wide matrix of RNA counts
 #' @export
@@ -118,7 +119,7 @@ setup_count_files = function(work_dir, variable_map = NULL){
 #' work_dir = "/slipstream_old/home/joeboyd/R_workspace/SFtapfly.data"
 #' load_counts(work_dir)
 #' load_counts(work_dir, name_composition = c(1, 2, 3, 4))
-load_counts = function(work_dir, library_type = NULL, name_composition = NULL, just_check_library_type = FALSE, gtf_file = NULL){
+load_counts = function(work_dir, library_type = NULL, name_composition = NULL, just_check_library_type = FALSE, gtf_file = NULL, name_attribute = "gene_name"){
   use_gene_name = ifelse(is.null(gtf_file), FALSE, TRUE)
   if(is.null(name_composition)){
     setup_var_map = NULL
@@ -168,7 +169,7 @@ load_counts = function(work_dir, library_type = NULL, name_composition = NULL, j
   mat = load_matrix_from_ReadsPerGene.out.tab(dt$file, library_type = library_type)
   colnames(mat) = dt$name
   if(use_gene_name){
-    mat = aggregate_by_gene_name(mat, gtf_file = gtf_file)
+    mat = aggregate_by_gene_name(mat, gtf_file = gtf_file, name_attribute = name_attribute)
   }
   mat
 }

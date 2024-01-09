@@ -3,6 +3,7 @@
 \name{report_completion}
 \alias{report_completion}
 \alias{report_progress}
+\alias{report_progress_plot}
 \alias{report_errors}
 \title{report_completion}
 \usage{
@@ -10,15 +11,28 @@ report_completion(tap_out)
 
 report_progress(tap_out)
 
+report_progress_plot(tap_out)
+
 report_errors(tap_out)
 }
 \arguments{
-\item{tap_out}{}
+\item{tap_out}{TAP output directory, either in progress or completed}
+}
+\value{
+data.frame reporting completion status per sample.
+
+Report additional details for each sample.
+
+Plot of job progress.
+
+Locate jobs that experienced errors and return relevant log files.
 }
 \description{
 report_completion
 
 report_progress
+
+report_progress_plot
 
 report_errors
 }
@@ -26,5 +40,6 @@ report_errors
 tap_out = "~/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output.rename"
 report_completion(tap_out)
 report_progress(tap_out)
+report_progress_plot(tap_out)
 report_errors(tap_out)
 }

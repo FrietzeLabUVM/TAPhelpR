@@ -204,24 +204,24 @@ This will return paths to all of the relevant .error log files. You'll need to i
 TAPhelpR contains several setup_*_files functions to create a convenient data.frame containing file paths and meta data.
 
 ```{r TAP_setup_files}
-bam_files = setup_bam_files(tap_out, variable_map = c("day", "sex", "rep"))
+bam_files = setup_bam_files(tap_out, variable_map = c("species", "day", "role", "rep"))
 ```
 
 The generic equivalent of the above looks like this:
 
 ```{r TAP_setup_files2}
-setup_files(tap_out, pattern = "sortedByCoord.out.bam$", variable_map = c("day", "sex", "rep"))
+setup_files(tap_out, pattern = "sortedByCoord.out.bam$", variable_map = c("species", "day", "role", "rep"))
 ```
 
 ## Run suppa2 diffSplice
 
 ```{r suppa2_join, eval=FALSE}
-suppa_joinFiles(bam_files, by = "sex")
+suppa_joinFiles(bam_files, by = "role")
 ```
 
 ```{r suppa2_diff, eval=FALSE}
 suppa_diffSplice(
-  ref_location = "~/lab_shared/indexes/honeybee",
+  ref_location = example_honeybee_reference(),
   PSI_todo = TAP_SPLICE_EVENTS$SkippingExon)
 ```
 
@@ -229,8 +229,8 @@ suppa_diffSplice(
 suppa_diffSplice.within_group(
   input_files = bam_files,
   within_group = "day",
-  between_group = "sex",
-  ref_location = "~/lab_shared/indexes/honeybee",
+  between_group = "role",
+  ref_location = example_honeybee_reference(),
   PSI_todo = TAP_SPLICE_EVENTS$SkippingExon)
 ```
 

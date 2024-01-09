@@ -9,7 +9,8 @@ load_counts(
   library_type = NULL,
   name_composition = NULL,
   just_check_library_type = FALSE,
-  gtf_file = NULL
+  gtf_file = NULL,
+  name_attribute = "gene_name"
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ load_counts(
 \item{just_check_library_type}{If TRUE, counts will not be loaded into a matrix and instead a vector of library type guesses will be returned. For a more detailed look at individual libraries use \link{guess_lib_from_file} with show_plots = TRUE.}
 
 \item{gtf_file}{Supply to convert gene_ids to gene_names (HGNC gene symbols). Either a path to a gtf file or GRanges object loaded from one with \link{load_gene_reference} or \link[rtracklayer:GFFFile-class]{rtracklayer::import.gff}.  The "gene_id" attribute will be matched to "gene_name" and aggregated by sum if required.}
+
+\item{name_attribute}{The attribute in the gtf file to which gene_ids should be aggregated. Default of "gene_name" mostly works but some gtfs use "gene".}
 }
 \value{
 wide matrix of RNA counts

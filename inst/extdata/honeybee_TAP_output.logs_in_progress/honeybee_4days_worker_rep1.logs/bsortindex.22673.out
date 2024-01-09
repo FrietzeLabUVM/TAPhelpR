@@ -1,0 +1,10 @@
+/slipstream_old/slurm/spool/slurmd/job22673/slurm_script /slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output.rename/honeybee_4days_worker_rep1.Aligned.out.bam --singularity /slipstream/home/joeboyd/lab_shared/scripts/TAP/tap_latest.sif
+BAM is /slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output.rename/honeybee_4days_worker_rep1.Aligned.out.bam
+OUT_BAM is /slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output.rename/honeybee_4days_worker_rep1.Aligned.sortedByCoord.out.bam
+container is /slipstream/home/joeboyd/lab_shared/scripts/TAP/tap_latest.sif
+container_type is singularity
+singularity BAM is /input_bam/honeybee_4days_worker_rep1.Aligned.out.bam
+singularity OUT_BAM is /output_bam/honeybee_4days_worker_rep1.Aligned.sortedByCoord.out.bam
+singularity TMP_DIR is /user_tmp
+/slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output.rename/honeybee_4days_worker_rep1.Aligned.sortedByCoord.out.bam
+FINISHED

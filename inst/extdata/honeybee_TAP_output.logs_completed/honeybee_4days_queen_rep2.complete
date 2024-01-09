@@ -1,0 +1,2 @@
+Fri 05 Jan 2024 04:59:53 PM EST
+if this file exists and is newer than start, then all jobs have finished without any errors. the output is complete and should not be overwritten.

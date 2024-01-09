@@ -1,0 +1,4 @@
+/slipstream_old/slurm/spool/slurmd/job22689/slurm_script /slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output.rename/honeybee_4days_queen_rep1.Aligned.toTranscriptome.out.bam /slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_reference/FASTA/GCF_003254395.2_Amel_HAv3.1_genomic.transcriptome.fa --singularity /slipstream/home/joeboyd/lab_shared/scripts/TAP/tap_latest.sif
+container is /slipstream/home/joeboyd/lab_shared/scripts/TAP/tap_latest.sif
+container_type is singularity
+FINISHED

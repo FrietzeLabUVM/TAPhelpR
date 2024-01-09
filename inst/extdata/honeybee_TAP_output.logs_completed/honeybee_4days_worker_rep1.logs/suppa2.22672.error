@@ -1,0 +1,59 @@
+INFO:psiPerGene:Reading GTF data.
+INFO:psiPerGene:Reading Expression data.
+INFO:psiPerGene:Calculating inclusion and generating output.
+INFO:lib.tools:File /output_salmon/tpm.txt opened in reading mode.
+INFO:psiCalculator:Buffering transcript expression levels.
+INFO:lib.tools:File /output_salmon/tpm.txt closed.
+INFO:lib.tools:File /suppa_ref/suppa2.GCF_003254395.2_genomic.gtf._A3_strict.ioe opened in reading mode.
+INFO:psiCalculator:Calculating PSI from the ioe file.
+INFO:lib.tools:File /suppa_ref/suppa2.GCF_003254395.2_genomic.gtf._A3_strict.ioe closed.
+INFO:psiCalculator:Generating output /output_salmon/suppa2.alternate_events.A3.psi
+INFO:psiCalculator:Done
+INFO:lib.tools:File /output_salmon/tpm.txt opened in reading mode.
+INFO:psiCalculator:Buffering transcript expression levels.
+INFO:lib.tools:File /output_salmon/tpm.txt closed.
+INFO:lib.tools:File /suppa_ref/suppa2.GCF_003254395.2_genomic.gtf._A5_strict.ioe opened in reading mode.
+INFO:psiCalculator:Calculating PSI from the ioe file.
+INFO:lib.tools:File /suppa_ref/suppa2.GCF_003254395.2_genomic.gtf._A5_strict.ioe closed.
+INFO:psiCalculator:Generating output /output_salmon/suppa2.alternate_events.A5.psi
+INFO:psiCalculator:Done
+INFO:lib.tools:File /output_salmon/tpm.txt opened in reading mode.
+INFO:psiCalculator:Buffering transcript expression levels.
+INFO:lib.tools:File /output_salmon/tpm.txt closed.
+INFO:lib.tools:File /suppa_ref/suppa2.GCF_003254395.2_genomic.gtf._AF_strict.ioe opened in reading mode.
+INFO:psiCalculator:Calculating PSI from the ioe file.
+INFO:lib.tools:File /suppa_ref/suppa2.GCF_003254395.2_genomic.gtf._AF_strict.ioe closed.
+INFO:psiCalculator:Generating output /output_salmon/suppa2.alternate_events.AF.psi
+INFO:psiCalculator:Done
+INFO:lib.tools:File /output_salmon/tpm.txt opened in reading mode.
+INFO:psiCalculator:Buffering transcript expression levels.
+INFO:lib.tools:File /output_salmon/tpm.txt closed.
+INFO:lib.tools:File /suppa_ref/suppa2.GCF_003254395.2_genomic.gtf._AL_strict.ioe opened in reading mode.
+INFO:psiCalculator:Calculating PSI from the ioe file.
+INFO:lib.tools:File /suppa_ref/suppa2.GCF_003254395.2_genomic.gtf._AL_strict.ioe closed.
+INFO:psiCalculator:Generating output /output_salmon/suppa2.alternate_events.AL.psi
+INFO:psiCalculator:Done
+INFO:lib.tools:File /output_salmon/tpm.txt opened in reading mode.
+INFO:psiCalculator:Buffering transcript expression levels.
+INFO:lib.tools:File /output_salmon/tpm.txt closed.
+INFO:lib.tools:File /suppa_ref/suppa2.GCF_003254395.2_genomic.gtf._MX_strict.ioe opened in reading mode.
+INFO:psiCalculator:Calculating PSI from the ioe file.
+INFO:lib.tools:File /suppa_ref/suppa2.GCF_003254395.2_genomic.gtf._MX_strict.ioe closed.
+INFO:psiCalculator:Generating output /output_salmon/suppa2.alternate_events.MX.psi
+INFO:psiCalculator:Done
+INFO:lib.tools:File /output_salmon/tpm.txt opened in reading mode.
+INFO:psiCalculator:Buffering transcript expression levels.
+INFO:lib.tools:File /output_salmon/tpm.txt closed.
+INFO:lib.tools:File /suppa_ref/suppa2.GCF_003254395.2_genomic.gtf._RI_strict.ioe opened in reading mode.
+INFO:psiCalculator:Calculating PSI from the ioe file.
+INFO:lib.tools:File /suppa_ref/suppa2.GCF_003254395.2_genomic.gtf._RI_strict.ioe closed.
+INFO:psiCalculator:Generating output /output_salmon/suppa2.alternate_events.RI.psi
+INFO:psiCalculator:Done
+INFO:lib.tools:File /output_salmon/tpm.txt opened in reading mode.
+INFO:psiCalculator:Buffering transcript expression levels.
+INFO:lib.tools:File /output_salmon/tpm.txt closed.
+INFO:lib.tools:File /suppa_ref/suppa2.GCF_003254395.2_genomic.gtf._SE_strict.ioe opened in reading mode.
+INFO:psiCalculator:Calculating PSI from the ioe file.
+INFO:lib.tools:File /suppa_ref/suppa2.GCF_003254395.2_genomic.gtf._SE_strict.ioe closed.
+INFO:psiCalculator:Generating output /output_salmon/suppa2.alternate_events.SE.psi
+INFO:psiCalculator:Done

@@ -238,17 +238,14 @@ GEO_download_files = function(srr_tofetch,
                               bash_or_sbatch = "sbatch",
                               return_commands = FALSE,
                               ncores = 1){
-  all_cmds = .create_sra_fetch_cmds(srr_tofetch, fastq_prefixes, out_dir, docker, singularity, ncores)
-  if(return_commands){
-    sapply(all_cmds, function(cmd){
-      paste(bash_or_sbatch, cmd)
-    })
-  }else{
-    sapply(all_cmds, function(cmd){
-      system(paste(bash_or_sbatch, cmd))
-    })
-  }
-  invisible(out_dir)
+  SRA_download_files(srr_tofetch = srr_tofetch,
+                     fastq_prefixes = fastq_prefixes,
+                     out_dir = out_dir,
+                     docker = docker,
+                     singularity = singularity,
+                     bash_or_sbatch = bash_or_sbatch,
+                     return_commands = return_commands,
+                     ncores = ncores)
 }
 
 .create_sra_fetch_cmds = function(srr_tofetch, fastq_prefixes, out_dir = getwd(), docker = NULL, singularity = NULL, ncores = 1){
@@ -279,3 +276,57 @@ GEO_download_files = function(srr_tofetch,
   all_cmds
 }
 
+#' SRA_download_files
+#'
+#' Uses [GEO_get_file_info] to get the required information for `srr_tofetch` and `fastq_prefixes`.
+#'
+#' @param srr_tofetch SRR accessions. SRR#####.
+#' @param fastq_prefixes Prefixes for final fastq files. "_R1_001.fastq.gz" or "_R2_001.fastq.gz" will be appended as appropriate.
+#' @param out_dir Location where fastq files will be downloaded to. Will be created if necessary.
+#' @param docker Optional name of docker image, REPOSITORY:TAG. docker will be used if provided.
+#' @param singularity Optional path to singularity .sif file. singularity will be used if provided.
+#' @param bash_or_sbatch How the script will be called. "bash" or "sbatch" are the most likely values. Additional flags can be passed to sbatch or similar here. For example, if using ncores > 1 you need to tell SLURM about this; i.e. bash_or_sbatch = "sbatch -c 4"
+#' @param return_commands If TRUE, commands are not executed via [system] but returned as a character vector.
+#'
+#' @return Invisibly returns the output directory where fastqs have been downloaded.
+#' @export
+#'
+#' @examples
+#' # you need the GSE accession
+#' gse_df = GEO_get_file_info("GSE152028")
+#' # you typically need to do some cleanup from the title to generate usable file prefixes.
+#' gse_df = dplyr::mutate(
+#'   gse_df,
+#'   name = sub(" \\+ ", "&", title)
+#' )
+#' gse_df = dplyr::mutate(
+#'   gse_df,
+#'   name = sub(" - ", " ", name)
+#' )
+#' gse_df = dplyr::mutate(
+#'   gse_df,
+#'   name = sub("input_DNA", "input", name)
+#' )
+#' gse_df$name = gsub(" +", "_", gse_df$name)
+#' gse_df$name = paste0(gse_df$name, ".", gse_df$srr)
+#' SRA_download_files(gse_df$srr, fastq_prefixes = gse_df$name, singularity = "tap_latest.sif", bash_or_sbatch = "bash")
+SRA_download_files = function(srr_tofetch,
+                              fastq_prefixes,
+                              out_dir = getwd(),
+                              docker = NULL,
+                              singularity = NULL,
+                              bash_or_sbatch = "sbatch",
+                              return_commands = FALSE,
+                              ncores = 1){
+  all_cmds = .create_sra_fetch_cmds(srr_tofetch, fastq_prefixes, out_dir, docker, singularity, ncores)
+  if(return_commands){
+    sapply(all_cmds, function(cmd){
+      paste(bash_or_sbatch, cmd)
+    })
+  }else{
+    sapply(all_cmds, function(cmd){
+      system(paste(bash_or_sbatch, cmd))
+    })
+  }
+  invisible(out_dir)
+}

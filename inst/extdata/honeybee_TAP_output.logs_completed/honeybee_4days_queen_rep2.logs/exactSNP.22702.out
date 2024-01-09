@@ -1,0 +1,6 @@
+/slipstream_old/slurm/spool/slurmd/job22702/slurm_script -b /slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output.rename/honeybee_4days_queen_rep2.Aligned.sortedByCoord.out.bam -fa /slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_reference/FASTA/GCF_003254395.2_Amel_HAv3.1_genomic.fasta --singularity /slipstream/home/joeboyd/lab_shared/scripts/TAP/tap_latest.sif
+container is /slipstream/home/joeboyd/lab_shared/scripts/TAP/tap_latest.sif
+container_type is singularity
+exactSNP command:
+singularity exec --bind /slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output.rename:/input_bam,/slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_reference/FASTA:/input_fasta,/slipstream_old/home/joeboyd/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output.rename:/output,/slipstream_old/home/joeboyd/tmp:/user_tmp /slipstream/home/joeboyd/lab_shared/scripts/TAP/tap_latest.sif exactSNP -b -s 20 -C /user_tmp -i /input_bam/honeybee_4days_queen_rep2.Aligned.sortedByCoord.out.bam -g /input_fasta/GCF_003254395.2_Amel_HAv3.1_genomic.fasta -o /output/honeybee_4days_queen_rep2.Aligned.sortedByCoord.out.all.exactSNP.vcf
+FINISHED

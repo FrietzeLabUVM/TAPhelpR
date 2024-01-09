@@ -1,0 +1,265 @@
+---
+title: "TAPhelpR_honeybee_example"
+author: "Joe Boyd"
+date: "2023-12-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+```
+
+# TAPhelpR
+
+## Installation
+
+```{bash, eval = FALSE}
+git clone git@github.com:FrietzeLabUVM/TAP.git
+cd TAP
+```
+
+```{bash}
+```
+
+```{r, eval = FALSE}
+if(!require("devtools")){
+  install.packages("devtools")
+}
+# This optional dependency has fallen out of Bioconductor and must be installed manually. 
+# It is only required to download data from ENCODE.
+devtools::install_github("CharlesJB/ENCODExplorer")
+devtools::install_github("FrietzeLabUVM/TAPhelpR")
+
+```
+
+```{r}
+library(TAPhelpR)
+library(tidyverse)
+```
+
+# Before Running TAP
+
+## Configs
+
+### Generate Config
+
+Configuration files are strongly recommended to run TAP. They can control all command line parameters and also set paths to fastq files. You should also take the opportunity to rename samples to something more meaningful and easier to work with. If you have sequencing replicates, they can be aggregated to single samples in the config.
+
+To use TAPhelpR to generate your config file, you need 2 things. A directory with *reference* files and a directory with *fastq.gz* files. 
+
+The *reference* directory should be generated using `setup_scripts/setup_new_reference.sh` from the directory where TAP is installed. This script requires 2 minimal inputs with some additional options. You must provide a single .fasta file and compatible (same organism assembly) gene reference .gtf/.gff file.
+
+The *fastq.gz* files must be gzipped should be for both reads if you have paired-end data. They also must have consistent suffixes (i.e. all end in _R1_001.fastq.gz or _R2_001.fastq.gz for PE data or all end in _R1_001.fastq.gz for SE data).  It's OK if your suffixes differ from these defaults, just be sure you specify f1_suffix (and f2_suffix for PE data) when creating the config file.
+
+```{r config setup}
+# if you're running this code locally, tap_in should be where the honeybee .fastq.gz files
+# tap_out should any location you wish to write the pipeline outputs to
+tap_in = example_honeybee_input()
+tap_out = example_honeybee_output()
+```
+
+```{r config create}
+cfg = config_create(
+  inDir = tap_in,
+  f1_suffix = "_1.fastq.gz", 
+  f2_suffix = "_2.fastq.gz",
+  outDir = tap_out,
+  singularity = "~/lab_shared/scripts/TAP/tap_latest.sif",
+  reference = example_honeybee_reference()
+)
+```
+
+`config_create` only gathers the information required to write the config file. We have the opportunity to add some important information before writing this config.
+
+In our case, `TAPhelpR` provides a metadata file to map SRR accessions to meaningful sample names.
+
+```{r config modify}
+# data.frame from config_create contains fastq file names and default sample name (fastq with suffix removed).
+cfg_fq = cfg$fastq_lines
+colnames(cfg_fq) = c("file", "srr")
+# use merge to add metadata
+meta_df = example_honeybee_metadata()
+cfg_fq = merge(meta_df, cfg_fq, by = "srr")
+cfg_fq = cfg_fq[, c("file", "name")]
+# replace fastq data.frame in cfg 
+cfg$fastq_lines = cfg_fq
+```
+
+Now we want to write the config file.
+
+```{r config write}
+config_write(cfg, "honeybee_config.csv", overwrite = TRUE)
+```
+
+### Validate Config
+
+Prior to running TAP, it's a good idea to validate our config file. This validation will not catch all possible errors but focuses on the most common and hardest to diagnose.
+
+```{r pressure, echo=FALSE}
+config_validate("honeybee_config.csv")
+```
+
+Note the output of the above is a data.frame with fastq files as the rownames and the _/. delimited name elements split. This also allows you to verify that your names are well formed. Well formed names have the same number of elements. Poorly formed names will make downstream analysis more painful as you'll constantly have to add additional code to handle these inconsistencies.
+
+You'll see a warning if sample names are not well formed.
+
+## Fetch Public Data
+
+### ENCODE
+
+You will need the [ENCODExplorer package installed](#installation).
+
+Fetching data consists of 2 steps. Retrieving file information from ENCODE as a data.frame. This data.frame must then be filtered and used to derive file names. Once this is done, the data.frame is used to fetch or download the specified files.
+
+```{r encode_info}
+enc_df = ENCODE_get_file_info(request_organisms = "Homo sapiens", request_target_chipseq = "IKZF1")
+enc_df.fe_bw = subset(enc_df, file_format == "bigWig" & output_type == "fold change over control" & assembly == "GRCh38")
+enc_df.fe_bw = dplyr::mutate(
+  enc_df.fe_bw,
+  rep = ifelse(grepl(";", biological_replicates), "pooled", biological_replicates)
+)
+DT::datatable(enc_df.fe_bw)
+```
+
+```{r encode_fetch, eval = FALSE}
+# you must set file_name on the input data.frame
+enc_df.fe_bw = dplyr::mutate(
+  enc_df.fe_bw,
+  file_name = paste(sep = "_",
+                    biosample_name,
+                    target, 
+                    rep,
+                    file_accession, 
+                    "FE.bw"
+  )
+)
+ENCODE_download_files(enc_df.fe_bw)
+```
+### GEO
+
+Retrieving data from GEO follows the same pattern as getting files from ENCODE except that you start with a valid GEO series accession number, i.e. GSE####.
+
+```{r geo_info, eval=FALSE}
+# you need the GSE accession
+gse_df = GEO_get_file_info("GSE152028")
+# you typically need to do some cleanup from the title
+gse_df = dplyr::mutate(
+  gse_df,
+  name = sub(" \\+ ", "&", title)
+)
+gse_df = dplyr::mutate(
+  gse_df,
+  name = sub(" - ", " ", name)
+)
+gse_df = dplyr::mutate(
+  gse_df,
+  name = sub("input_DNA", "input", name)
+)
+gse_df$name = gsub(" +", "_", gse_df$name)
+gse_df$name = paste0(gse_df$name, ".", gse_df$srr)
+DT::datatable(gse_df)
+```
+
+```{r geo_fetch, eval=FALSE}
+GEO_download_files(gse_df$srr, fastq_prefixes = gse_df$name, singularity = "tap_latest.sif", bash_or_sbatch = "bash")
+```
+
+# After running TAP
+
+## Evaluate completeness
+
+After submitting the TAP pipeline, it's nice to know how close to completion it is.  Once it's finished, identifying and debugging any errors is also critical. `TAPhelpR` provides a series of *report* functions for this purpose.
+
+`report_completion` is the most basic of these functions. It simply checks for the existence of 3 files that TAP write to record its status.
+
+```{r report_complete, message=TRUE}
+report_completion(tap_out)
+```
+Here we see a message reporting the number of samples that have begun running and: 1) how many are still processing and 2) how many have finished with no errors.
+
+If all samples have finished without error there's no reason to investigate further.
+
+For a more detailed report of progress, use `report_progress`. You'll receive a warning if any steps failed to complete due to errors.
+
+```{r}
+report_progress(tap_out)
+```
+Finally, if there were errors, use `report_errors`.
+
+```{r report_errors}
+report_errors(tap_out)
+```
+
+This will return paths to all of the relevant .error log files. You'll need to investigate these files to diagnose and resolve the errors. You may need to delete affected files but then you can resubmit TAP using the same output. You must allow TAP to finish running or cancel remaining jobs before resubmitting.
+
+## Working with outputs
+
+TAPhelpR contains several setup_*_files functions to create a convenient data.frame containing file paths and meta data.
+
+```{r TAP_setup_files}
+bam_files = setup_bam_files(tap_out, variable_map = c("species", "day", "role", "rep"))
+```
+
+The generic equivalent of the above looks like this:
+
+```{r TAP_setup_files2}
+setup_files(tap_out, pattern = "sortedByCoord.out.bam$", variable_map = c("species", "day", "role", "rep"))
+```
+
+## Run suppa2 diffSplice
+
+```{r suppa2_join, eval=FALSE}
+suppa_joinFiles(bam_files, by = "role")
+```
+
+```{r suppa2_diff, eval=FALSE}
+suppa_diffSplice(
+  ref_location = example_honeybee_reference(),
+  PSI_todo = TAP_SPLICE_EVENTS$SkippingExon)
+```
+
+```{r suppa2_diff_group, eval=FALSE}
+suppa_diffSplice.within_group(
+  input_files = bam_files,
+  within_group = "day",
+  between_group = "role",
+  ref_location = example_honeybee_reference(),
+  PSI_todo = TAP_SPLICE_EVENTS$SkippingExon)
+```
+
+```{r suppa2_cluster, eval=FALSE}
+suppa_clusterEvents(PSI_todo = TAP_SPLICE_EVENTS$SkippingExon)
+```
+
+## Counts and DESeq2
+
+```{r, load_counts}
+mat = load_counts(tap_out)
+head(mat)
+```
+
+```{r, load_counts_gene_name, eval=FALSE}
+#if you supply the reference gtf file, or GRanges of same, to load_counts, gene_ids in counts will be aggregated to gene_name
+mat.gene_name = load_counts(tap_out, gtf_file = file.path(example_honeybee_reference(), "GTF/current.gtf"))
+```
+
+```{r deseq2}
+library(DESeq2)
+meta_df = bam_files
+meta_df$file = NULL
+meta_df = dplyr::mutate(meta_df, name = paste(day, sex, rep, sep = "_"))
+des = DESeqDataSetFromMatrix(mat[, meta_df$name], colData = meta_df, design = ~sex)
+# and run from there ...
+```
+
+## UCSC tracks
+
+```{r, ucsc}
+stage_output_for_UCSC_tracks(tap_out, track_hosting_dir = "~/public_files/honeybee")
+"~/public_files/honeybee" %>% 
+  dir(full.names = TRUE) %>% 
+  dir(full.names = TRUE) %>% 
+  sample(size = 6)
+```
+
+launch shiny app

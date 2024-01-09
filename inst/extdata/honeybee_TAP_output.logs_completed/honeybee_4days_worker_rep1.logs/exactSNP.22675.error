@@ -1,0 +1,227 @@
+
+        ==========     _____ _    _ ____  _____  ______          _____  
+        =====         / ____| |  | |  _ \|  __ \|  ____|   /\   |  __ \ 
+          =====      | (___ | |  | | |_) | |__) | |__     /  \  | |  | |
+            ====      \___ \| |  | |  _ <|  _  /|  __|   / /\ \ | |  | |
+              ====    ____) | |__| | |_) | | \ \| |____ / ____ \| |__| |
+        ==========   |_____/ \____/|____/|_|  \_\______/_/    \_\_____/
+	  v2.0.3
+
+//============================= exactSNP setting =============================\\
+||                                                                            ||
+||                   Input file : honeybee_4days_worker_rep1.Aligned.sort ... ||
+||                  Output file : honeybee_4days_worker_rep1.Aligned.sort ... ||
+||             Reference genome : GCF_003254395.2_Amel_HAv3.1_genomic.fasta   ||
+||                    Temp path : /user_tmp                                   ||
+||                                                                            ||
+||                      Threads : 1                                           ||
+||         Min supporting reads : 1                                           ||
+|| Min pct. of supporting reads : 0.0%                                        ||
+||       Min base quality score : 20                                          ||
+||      Number of trimmed bases : 3                                           ||
+||                                                                            ||
+||               Q value cutoff : 10E-12.0                                    ||
+||          P value upper bound : 0.00500                                     ||
+||        Flanking windows size : 5                                           ||
+||                                                                            ||
+\\============================================================================//
+
+//====================== Running (05-Jan-2024 15:59:31) ======================\\
+||                                                                            ||
+|| Split BAM file into /user_tmp/temp-snps-1731604-F01FAFED67E3-* ...         ||
+|| processed block NC_037638.1@15000000 by thread 1/1 [block number=1/123]    ||
+|| processed block NC_037638.1@27754200 by thread 1/1 [block number=2/123]    ||
+|| processed block NC_037639.1@15000000 by thread 1/1 [block number=3/123]    ||
+|| processed block NC_037639.1@16089512 by thread 1/1 [block number=4/123]    ||
+|| processed block NW_020555788.1@3988 by thread 1/1 [block number=4/123]     ||
+|| processed block NC_037640.1@13619445 by thread 1/1 [block number=5/123]    ||
+|| processed block NC_037641.1@13404451 by thread 1/1 [block number=6/123]    ||
+|| processed block NC_037642.1@13896941 by thread 1/1 [block number=7/123]    ||
+|| processed block NW_020555789.1@24043 by thread 1/1 [block number=7/123]    ||
+|| processed block NC_037643.1@15000000 by thread 1/1 [block number=8/123]    ||
+|| processed block NC_037643.1@17789102 by thread 1/1 [block number=9/123]    ||
+|| processed block NW_020555790.1@23881 by thread 1/1 [block number=10/123]   ||
+|| processed block NC_037644.1@14198698 by thread 1/1 [block number=11/123]   ||
+|| processed block NW_020555791.1@28854 by thread 1/1 [block number=11/123]   ||
+|| processed block NW_020555792.1@22163 by thread 1/1 [block number=12/123]   ||
+|| processed block NW_020555793.1@12667 by thread 1/1 [block number=12/123]   ||
+|| processed block NC_037645.1@12717210 by thread 1/1 [block number=13/123]   ||
+|| processed block NW_020555794.1@40528 by thread 1/1 [block number=14/123]   ||
+|| processed block NW_020555795.1@17189 by thread 1/1 [block number=15/123]   ||
+|| processed block NW_020555796.1@11842 by thread 1/1 [block number=16/123]   ||
+|| processed block NC_037646.1@12354651 by thread 1/1 [block number=17/123]   ||
+|| processed block NW_020555797.1@41529 by thread 1/1 [block number=18/123]   ||
+|| processed block NW_020555798.1@41327 by thread 1/1 [block number=18/123]   ||
+|| processed block NW_020555799.1@36874 by thread 1/1 [block number=18/123]   ||
+|| processed block NW_020555800.1@34862 by thread 1/1 [block number=18/123]   ||
+|| processed block NW_020555801.1@31353 by thread 1/1 [block number=19/123]   ||
+|| processed block NW_020555802.1@26859 by thread 1/1 [block number=19/123]   ||
+|| processed block NW_020555803.1@25295 by thread 1/1 [block number=19/123]   ||
+|| processed block NW_020555804.1@21070 by thread 1/1 [block number=20/123]   ||
+|| processed block NW_020555805.1@18505 by thread 1/1 [block number=21/123]   ||
+|| processed block NW_020555806.1@17223 by thread 1/1 [block number=22/123]   ||
+|| processed block NW_020555807.1@17199 by thread 1/1 [block number=22/123]   ||
+|| processed block NW_020555808.1@15069 by thread 1/1 [block number=23/123]   ||
+|| processed block NW_020555809.1@14774 by thread 1/1 [block number=24/123]   ||
+|| processed block NW_020555810.1@11259 by thread 1/1 [block number=24/123]   ||
+|| processed block NW_020555811.1@11145 by thread 1/1 [block number=24/123]   ||
+|| processed block NW_020555812.1@6719 by thread 1/1 [block number=25/123]    ||
+|| processed block NW_020555813.1@4248 by thread 1/1 [block number=26/123]    ||
+|| processed block NC_037647.1@12360052 by thread 1/1 [block number=27/123]   ||
+|| processed block NW_020555814.1@95318 by thread 1/1 [block number=28/123]   ||
+|| processed block NW_020555815.1@67913 by thread 1/1 [block number=29/123]   ||
+|| processed block NW_020555816.1@40431 by thread 1/1 [block number=30/123]   ||
+|| processed block NW_020555817.1@28022 by thread 1/1 [block number=31/123]   ||
+|| processed block NW_020555818.1@23055 by thread 1/1 [block number=32/123]   ||
+|| processed block NW_020555819.1@22320 by thread 1/1 [block number=33/123]   ||
+|| processed block NW_020555820.1@20023 by thread 1/1 [block number=34/123]   ||
+|| processed block NC_037648.1@15000000 by thread 1/1 [block number=35/123]   ||
+|| processed block NC_037648.1@16352600 by thread 1/1 [block number=36/123]   ||
+|| processed block NW_020555821.1@35182 by thread 1/1 [block number=37/123]   ||
+|| processed block NW_020555822.1@24609 by thread 1/1 [block number=38/123]   ||
+|| processed block NW_020555823.1@15613 by thread 1/1 [block number=39/123]   ||
+|| processed block NW_020555824.1@13259 by thread 1/1 [block number=40/123]   ||
+|| processed block NW_020555825.1@3624 by thread 1/1 [block number=41/123]    ||
+|| processed block NC_037649.1@11514234 by thread 1/1 [block number=42/123]   ||
+|| processed block NW_020555826.1@18903 by thread 1/1 [block number=42/123]   ||
+|| processed block NC_037650.1@11279722 by thread 1/1 [block number=43/123]   ||
+|| processed block NC_037651.1@10670842 by thread 1/1 [block number=44/123]   ||
+|| processed block NW_020555827.1@35146 by thread 1/1 [block number=45/123]   ||
+|| processed block NW_020555828.1@24061 by thread 1/1 [block number=46/123]   ||
+|| processed block NW_020555829.1@23155 by thread 1/1 [block number=47/123]   ||
+|| processed block NW_020555830.1@21574 by thread 1/1 [block number=48/123]   ||
+|| processed block NW_020555831.1@19344 by thread 1/1 [block number=48/123]   ||
+|| processed block NW_020555832.1@16896 by thread 1/1 [block number=48/123]   ||
+|| processed block NW_020555833.1@16072 by thread 1/1 [block number=49/123]   ||
+|| processed block NW_020555834.1@14199 by thread 1/1 [block number=50/123]   ||
+|| processed block NW_020555835.1@13856 by thread 1/1 [block number=51/123]   ||
+|| processed block NW_020555836.1@12635 by thread 1/1 [block number=51/123]   ||
+|| processed block NW_020555837.1@12630 by thread 1/1 [block number=51/123]   ||
+|| processed block NW_020555838.1@11160 by thread 1/1 [block number=51/123]   ||
+|| processed block NW_020555839.1@9716 by thread 1/1 [block number=51/123]    ||
+|| processed block NW_020555840.1@8753 by thread 1/1 [block number=52/123]    ||
+|| processed block NC_037652.1@9534514 by thread 1/1 [block number=53/123]    ||
+|| processed block NW_020555841.1@73645 by thread 1/1 [block number=54/123]   ||
+|| processed block NW_020555842.1@60267 by thread 1/1 [block number=55/123]   ||
+|| processed block NW_020555843.1@44578 by thread 1/1 [block number=56/123]   ||
+|| processed block NW_020555844.1@35241 by thread 1/1 [block number=57/123]   ||
+|| processed block NW_020555845.1@24031 by thread 1/1 [block number=57/123]   ||
+|| processed block NW_020555846.1@23749 by thread 1/1 [block number=58/123]   ||
+|| processed block NW_020555847.1@21570 by thread 1/1 [block number=58/123]   ||
+|| processed block NW_020555848.1@21229 by thread 1/1 [block number=58/123]   ||
+|| processed block NW_020555849.1@20706 by thread 1/1 [block number=58/123]   ||
+|| processed block NW_020555850.1@18311 by thread 1/1 [block number=59/123]   ||
+|| processed block NW_020555851.1@10530 by thread 1/1 [block number=60/123]   ||
+|| processed block NW_020555852.1@9153 by thread 1/1 [block number=60/123]    ||
+|| processed block NW_020555853.1@5948 by thread 1/1 [block number=61/123]    ||
+|| processed block NW_020555854.1@5288 by thread 1/1 [block number=61/123]    ||
+|| processed block NW_020555855.1@4502 by thread 1/1 [block number=62/123]    ||
+|| processed block NW_020555856.1@3152 by thread 1/1 [block number=63/123]    ||
+|| processed block NW_020555857.1@3072 by thread 1/1 [block number=64/123]    ||
+|| processed block NW_020555858.1@2987 by thread 1/1 [block number=65/123]    ||
+|| processed block NC_037653.1@7238532 by thread 1/1 [block number=66/123]    ||
+|| processed block NW_020555859.1@486754 by thread 1/1 [block number=67/123]  ||
+|| processed block NW_020555860.1@311923 by thread 1/1 [block number=68/123]  ||
+|| processed block NW_020555861.1@135562 by thread 1/1 [block number=69/123]  ||
+|| processed block NW_020555862.1@120686 by thread 1/1 [block number=70/123]  ||
+|| processed block NW_020555863.1@108711 by thread 1/1 [block number=71/123]  ||
+|| processed block NW_020555864.1@92711 by thread 1/1 [block number=72/123]   ||
+|| processed block NW_020555865.1@68035 by thread 1/1 [block number=73/123]   ||
+|| processed block NW_020555866.1@66194 by thread 1/1 [block number=74/123]   ||
+|| processed block NW_020555867.1@56971 by thread 1/1 [block number=75/123]   ||
+|| processed block NW_020555868.1@56225 by thread 1/1 [block number=76/123]   ||
+|| processed block NW_020555869.1@52709 by thread 1/1 [block number=77/123]   ||
+|| processed block NW_020555870.1@52744 by thread 1/1 [block number=78/123]   ||
+|| processed block NW_020555871.1@49670 by thread 1/1 [block number=79/123]   ||
+|| processed block NW_020555872.1@49506 by thread 1/1 [block number=80/123]   ||
+|| processed block NW_020555873.1@36396 by thread 1/1 [block number=81/123]   ||
+|| processed block NW_020555874.1@35193 by thread 1/1 [block number=82/123]   ||
+|| processed block NW_020555875.1@35070 by thread 1/1 [block number=83/123]   ||
+|| processed block NW_020555876.1@34588 by thread 1/1 [block number=84/123]   ||
+|| processed block NW_020555877.1@33219 by thread 1/1 [block number=85/123]   ||
+|| processed block NW_020555878.1@30850 by thread 1/1 [block number=86/123]   ||
+|| processed block NW_020555879.1@30345 by thread 1/1 [block number=86/123]   ||
+|| processed block NW_020555880.1@30149 by thread 1/1 [block number=87/123]   ||
+|| processed block NW_020555881.1@29749 by thread 1/1 [block number=87/123]   ||
+|| processed block NW_020555882.1@29493 by thread 1/1 [block number=88/123]   ||
+|| processed block NW_020555883.1@28697 by thread 1/1 [block number=89/123]   ||
+|| processed block NW_020555884.1@25587 by thread 1/1 [block number=90/123]   ||
+|| processed block NW_020555885.1@25299 by thread 1/1 [block number=91/123]   ||
+|| processed block NW_020555886.1@25083 by thread 1/1 [block number=92/123]   ||
+|| processed block NW_020555887.1@24917 by thread 1/1 [block number=93/123]   ||
+|| processed block NW_020555888.1@24436 by thread 1/1 [block number=94/123]   ||
+|| processed block NW_020555889.1@22456 by thread 1/1 [block number=94/123]   ||
+|| processed block NW_020555890.1@22137 by thread 1/1 [block number=95/123]   ||
+|| processed block NW_020555891.1@21830 by thread 1/1 [block number=96/123]   ||
+|| processed block NW_020555892.1@21705 by thread 1/1 [block number=96/123]   ||
+|| processed block NW_020555893.1@21390 by thread 1/1 [block number=96/123]   ||
+|| processed block NW_020555894.1@21197 by thread 1/1 [block number=97/123]   ||
+|| processed block NW_020555895.1@20251 by thread 1/1 [block number=98/123]   ||
+|| processed block NW_020555896.1@19254 by thread 1/1 [block number=99/123]   ||
+|| processed block NW_020555897.1@18419 by thread 1/1 [block number=100/123]  ||
+|| processed block NW_020555898.1@18185 by thread 1/1 [block number=100/123]  ||
+|| processed block NW_020555899.1@18108 by thread 1/1 [block number=101/123]  ||
+|| processed block NW_020555900.1@16039 by thread 1/1 [block number=102/123]  ||
+|| processed block NW_020555901.1@15874 by thread 1/1 [block number=103/123]  ||
+|| processed block NW_020555902.1@15501 by thread 1/1 [block number=104/123]  ||
+|| processed block NW_020555903.1@15245 by thread 1/1 [block number=105/123]  ||
+|| processed block NW_020555904.1@14627 by thread 1/1 [block number=106/123]  ||
+|| processed block NW_020555905.1@14470 by thread 1/1 [block number=106/123]  ||
+|| processed block NW_020555906.1@14429 by thread 1/1 [block number=106/123]  ||
+|| processed block NW_020555907.1@13874 by thread 1/1 [block number=107/123]  ||
+|| processed block NW_020555908.1@13557 by thread 1/1 [block number=107/123]  ||
+|| processed block NW_020555909.1@13184 by thread 1/1 [block number=107/123]  ||
+|| processed block NW_020555910.1@12682 by thread 1/1 [block number=108/123]  ||
+|| processed block NW_020555911.1@12676 by thread 1/1 [block number=109/123]  ||
+|| processed block NW_020555912.1@12477 by thread 1/1 [block number=109/123]  ||
+|| processed block NW_020555913.1@12356 by thread 1/1 [block number=110/123]  ||
+|| processed block NW_020555914.1@12212 by thread 1/1 [block number=110/123]  ||
+|| processed block NW_020555915.1@12075 by thread 1/1 [block number=110/123]  ||
+|| processed block NW_020555916.1@11738 by thread 1/1 [block number=111/123]  ||
+|| processed block NW_020555917.1@11215 by thread 1/1 [block number=112/123]  ||
+|| processed block NW_020555918.1@10554 by thread 1/1 [block number=112/123]  ||
+|| processed block NW_020555919.1@9876 by thread 1/1 [block number=112/123]   ||
+|| processed block NW_020555920.1@9803 by thread 1/1 [block number=113/123]   ||
+|| processed block NW_020555921.1@9724 by thread 1/1 [block number=114/123]   ||
+|| processed block NW_020555922.1@9462 by thread 1/1 [block number=115/123]   ||
+|| processed block NW_020555923.1@9171 by thread 1/1 [block number=115/123]   ||
+|| processed block NW_020555924.1@9093 by thread 1/1 [block number=116/123]   ||
+|| processed block NW_020555925.1@8299 by thread 1/1 [block number=117/123]   ||
+|| processed block NW_020555926.1@8261 by thread 1/1 [block number=117/123]   ||
+|| processed block NW_020555927.1@8085 by thread 1/1 [block number=117/123]   ||
+|| processed block NW_020555928.1@8075 by thread 1/1 [block number=117/123]   ||
+|| processed block NW_020555929.1@7938 by thread 1/1 [block number=118/123]   ||
+|| processed block NW_020555930.1@7794 by thread 1/1 [block number=118/123]   ||
+|| processed block NW_020555931.1@7505 by thread 1/1 [block number=118/123]   ||
+|| processed block NW_020555932.1@7322 by thread 1/1 [block number=118/123]   ||
+|| processed block NW_020555933.1@7158 by thread 1/1 [block number=119/123]   ||
+|| processed block NW_020555934.1@7118 by thread 1/1 [block number=119/123]   ||
+|| processed block NW_020555935.1@7093 by thread 1/1 [block number=119/123]   ||
+|| processed block NW_020555936.1@6759 by thread 1/1 [block number=119/123]   ||
+|| processed block NW_020555937.1@6019 by thread 1/1 [block number=119/123]   ||
+|| processed block NW_020555938.1@5439 by thread 1/1 [block number=120/123]   ||
+|| processed block NW_020555939.1@5147 by thread 1/1 [block number=120/123]   ||
+|| processed block NW_020555940.1@5036 by thread 1/1 [block number=120/123]   ||
+|| processed block NW_020555941.1@5006 by thread 1/1 [block number=120/123]   ||
+|| processed block NW_020555942.1@4954 by thread 1/1 [block number=120/123]   ||
+|| processed block NW_020555943.1@4407 by thread 1/1 [block number=120/123]   ||
+|| processed block NW_020555944.1@3840 by thread 1/1 [block number=121/123]   ||
+|| processed block NW_020555945.1@3691 by thread 1/1 [block number=121/123]   ||
+|| processed block NW_020555946.1@2376 by thread 1/1 [block number=122/123]   ||
+|| processed block NW_020555947.1@2302 by thread 1/1 [block number=122/123]   ||
+|| processed block NC_001566.1@16343 by thread 1/1 [block number=123/123]     ||
+||                                                                            ||
+||                          Completed successfully.                           ||
+||                                                                            ||
+\\============================================================================//
+
+//================================= Summary ==================================\\
+||                                                                            ||
+||              Processed reads : 36781572                                    ||
+||                Reported SNPs : 80389                                       ||
+||              Reported indels : 223682                                      ||
+||                                                                            ||
+||                 Running time : 11.9 minutes                                ||
+||                                                                            ||
+\\============================================================================//
+

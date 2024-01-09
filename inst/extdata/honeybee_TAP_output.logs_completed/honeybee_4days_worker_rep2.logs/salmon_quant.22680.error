@@ -1,0 +1,83 @@
+Version Info: ### PLEASE UPGRADE SALMON ###
+### A newer version of salmon with important bug fixes and improvements is available. ####
+###
+The newest version, available at https://github.com/COMBINE-lab/salmon/releases
+contains new features, improvements, and bug fixes; please upgrade at your
+earliest convenience.
+###
+Sign up for the salmon mailing list to hear about new versions, features and updates at:
+https://oceangenomics.com/subscribe
+salmon requires at least 2 threads --- setting # of threads = 2
+# salmon (alignment-based) v1.9.0
+# [ program ] => salmon 
+# [ command ] => quant 
+# [ threads ] => { 1 }
+# [ targets ] => { /input_gtf/GCF_003254395.2_Amel_HAv3.1_genomic.transcriptome.fa }
+# [ libType ] => { A }
+# [ alignments ] => { /input_bam/honeybee_4days_worker_rep2.Aligned.toTranscriptome.out.bam }
+# [ output ] => { /output_salmon }
+# [ gencode ] => { }
+Logs will be written to /output_salmon/logs
+[2024-01-05 15:46:58.752] [jointLog] [info] setting maxHashResizeThreads to 2
+[2024-01-05 15:46:58.752] [jointLog] [info] Fragment incompatibility prior below threshold.  Incompatible fragments will be ignored.
+Library format { type:paired end, relative orientation:inward, strandedness:unstranded }
+parseThreads = 2
+[2024-01-05 15:46:59.093] [jointLog] [info] numQuantThreads = 2
+Checking that provided alignment files have consistent headers . . . done
+Populating targets from aln = "/input_bam/honeybee_4days_worker_rep2.Aligned.toTranscriptome.out.bam", fasta = "/input_gtf/GCF_003254395.2_Amel_HAv3.1_genomic.transcriptome.fa" . . .done
+
+
+
+
+[0;32mprocessed[0;31m 0 [0;32mreads in current round[0;0m[2024-01-05 15:47:00.722] [jointLog] [info] replaced 0 non-ACGT nucleotides with random nucleotides
+[2024-01-05 15:47:02.023] [jointLog] [info] Automatically detected most likely library type as IU
+
+[0;32mprocessed[0;31m 1000000 [0;32mreads in current round[0;0m[0;32mprocessed[0;31m 2000000 [0;32mreads in current round[0;0m[2024-01-05 15:47:31.964] [jointLog] [info] 
+
+The alignment group queue pool has been exhausted.  2730066 extra fragments were allocated on the heap to saturate the pool.  No new fragments will be allocated
+
+
+[0;32mprocessed[0;31m 3000000 [0;32mreads in current round[0;0m[0;32mprocessed[0;31m 4000000 [0;32mreads in current round[0;0m[0;32mprocessed[0;31m 5000000 [0;32mreads in current round[0;0m[0;32mprocessed[0;31m 6000000 [0;32mreads in current round[0;0m[0;32mprocessed[0;31m 7000000 [0;32mreads in current round[0;0m[0;32mprocessed[0;31m 8000000 [0;32mreads in current round[0;0m[0;32mprocessed[0;31m 9000000 [0;32mreads in current round[0;0m[0;32mprocessed[0;31m 10000000 [0;32mreads in current round[0;0m[0;32mprocessed[0;31m 11000000 [0;32mreads in current round[0;0m[0;32mprocessed[0;31m 12000000 [0;32mreads in current round[0;0m[0;32mprocessed[0;31m 12624730 [0;32mreads in current round[0;0m
+killing thread 0 . . . donekilling thread 1 . . . done
+
+# observed = 12624730 / # required = 50000000[A[A[A[A[A
+
+
+
+[2024-01-05 15:53:04.444] [jointLog] [info] Thread saw mini-batch with a maximum of 0.20% zero probability fragments
+[2024-01-05 15:53:04.448] [jointLog] [info] Thread saw mini-batch with a maximum of 0.20% zero probability fragments
+[2024-01-05 15:53:04.449] [jointLog] [info] 
+
+
+Completed first pass through the alignment file.
+Total # of mapped reads : 12624730
+# of uniquely mapped reads : 7976308
+# ambiguously mapped reads : 4648422
+
+
+
+[2024-01-05 15:53:04.494] [jointLog] [info] Computed 38143 rich equivalence classes for further processing
+[2024-01-05 15:53:04.494] [jointLog] [info] Counted 12624227 total reads in the equivalence classes 
+[2024-01-05 15:53:04.496] [jointLog] [info] starting optimizer
+[2024-01-05 15:53:04.519] [jointLog] [info] Marked 0 weighted equivalence classes as degenerate
+[2024-01-05 15:53:04.525] [jointLog] [info] iteration = 0 | max rel diff. = 13819.1
+[2024-01-05 15:53:05.125] [jointLog] [info] iteration = 100 | max rel diff. = 16.7904
+[2024-01-05 15:53:05.714] [jointLog] [info] iteration = 200 | max rel diff. = 15.0317
+[2024-01-05 15:53:06.302] [jointLog] [info] iteration = 300 | max rel diff. = 2.48476
+[2024-01-05 15:53:06.887] [jointLog] [info] iteration = 400 | max rel diff. = 0.260427
+[2024-01-05 15:53:07.472] [jointLog] [info] iteration = 500 | max rel diff. = 3.70925
+[2024-01-05 15:53:08.058] [jointLog] [info] iteration = 600 | max rel diff. = 0.333272
+[2024-01-05 15:53:08.643] [jointLog] [info] iteration = 700 | max rel diff. = 0.801014
+[2024-01-05 15:53:09.238] [jointLog] [info] iteration = 800 | max rel diff. = 0.0787765
+[2024-01-05 15:53:09.833] [jointLog] [info] iteration = 900 | max rel diff. = 0.218837
+[2024-01-05 15:53:10.419] [jointLog] [info] iteration = 1000 | max rel diff. = 0.0316143
+[2024-01-05 15:53:10.730] [jointLog] [info] iteration = 1054 | max rel diff. = 0.00977999
+[2024-01-05 15:53:10.735] [jointLog] [info] finished optimizer
+[2024-01-05 15:53:10.735] [jointLog] [info] writing output
+
+Freeing memory used by read queue . . . 
+Joined parsing thread . . . "/input_bam/honeybee_4days_worker_rep2.Aligned.toTranscriptome.out.bam" 
+Closed all files . . . 
+Emptied frag queue. . . 
+Emptied Alignment Group Pool. . 
+Emptied Alignment Group Queue. . . done

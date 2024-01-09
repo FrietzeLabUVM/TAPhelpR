@@ -167,12 +167,12 @@ load_ReadsPerGene.out.tab = function(f, library_type){
   dt_genes
 }
 
-aggregate_by_gene_name = function(exp_cnt_mat, gtf_file){
+aggregate_by_gene_name = function(exp_cnt_mat, gtf_file, name_attribute = "gene_name"){
   exp_cnt_dt = data.table::as.data.table(exp_cnt_mat, keep.rownames = "gene_id")
-  create_matrix_from_data.table(exp_cnt_dt, gtf_file = gtf_file)
+  create_matrix_from_data.table(exp_cnt_dt, gtf_file = gtf_file, name_attribute = name_attribute)
 }
 
-create_matrix_from_data.table = function(exp_cnt_dt, gtf_file){
+create_matrix_from_data.table = function(exp_cnt_dt, gtf_file, name_attribute = "gene_name"){
   #### convert to gene_name ####
   if(is.character(gtf_file)){
     message("loading gtf...")
@@ -184,7 +184,14 @@ create_matrix_from_data.table = function(exp_cnt_dt, gtf_file){
   names(ref_gr) = ref_gr$gene_id
 
   message("aggregate by gene_name...")
-  ref_dt = unique(data.table::data.table(gene_id = ref_gr$gene_id, gene_name = ref_gr$gene_name))
+  if(!name_attribute %in% colnames(mcols(ref_gr))){
+    stop("name_attribute: ", name_attribute, " not found in gtf file. Possibe valid values included:\n",
+         paste(collapse = "\n",
+           setdiff(colnames(mcols(ref_gr)),
+                   c("gene_id")))
+    )
+  }
+  ref_dt = unique(data.table::data.table(gene_id = ref_gr$gene_id, gene_name = ref_gr[[name_attribute]]))
   exp_cnt_dt.tidy = reshape2::melt(exp_cnt_dt, id.vars = "gene_id", value.name = "count", variable.name = "sample_id")
   stopifnot(all(unique(exp_cnt_dt.tidy$gene_id) %in% ref_dt$gene_id))
   #aggregate by gene_name

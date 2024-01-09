@@ -1,16 +1,21 @@
-tap_out = "~/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output.rename"
-
 #' report_completion
 #'
 #' @param tap_out TAP output directory, either in progress or completed
 #'
-#' @return
+#' @return data.frame reporting completion status per sample.
 #' @export
 #' @rdname report-output
 #' @examples
-#' tap_out = "~/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output.rename"
+#' tap_out = example_honeybee_output()
 #' report_completion(tap_out)
 #' report_progress(tap_out)
+#' report_progress_plot(tap_out)
+#' report_errors(tap_out)
+#'
+#' tap_out = example_honeybee_output.in_progress()
+#' report_completion(tap_out)
+#' report_progress(tap_out)
+#' report_progress_plot(tap_out)
 #' report_errors(tap_out)
 report_completion = function(tap_out){
   detect_files = function(suffix, df = NULL){
@@ -51,9 +56,7 @@ report_completion = function(tap_out){
 
 #' report_progress
 #'
-#' @param tap_out
-#'
-#' @return
+#' @return Report additional details for each sample.
 #' @export
 #'
 #' @rdname report-output
@@ -126,17 +129,37 @@ filter_files_for_most_recent = function(f){
   rownames(f_info)[!is_dupe]
 }
 
-#' report_errors
-#'
-#' @param tap_out
-#'
-#' @return
-#' @export
-#' @rdname report-output
-report_errors = function(tap_out){
+.sample_report = function(tap_out){
+  step_lev = rev(c("STAR_align", "bsortindex", "salmon_quant", "suppa2", "exactSNP", "make_bigwigs", "sample_status"))
+  start_files = dir(tap_out, pattern = ".start$", full.names = TRUE)
+  finish_files = dir(tap_out, pattern = ".finish$", full.names = TRUE)
+  complete_files = dir(tap_out, pattern = ".complete$", full.names = TRUE)
+  dt = data.table(file = c(start_files, finish_files, complete_files))
+  dt$job_status = sapply(strsplit(basename(dt$file), "\\."), function(x)x[length(x)])
+  dt[, sample_name := sub(paste0(".", job_status), "", basename(file)), .(file)]
+  dt$present = TRUE
+  dt = dcast(dt, sample_name~job_status, value.var = "present", fill = FALSE)
+  dt$step = "sample_status"
+  dt$step = factor(dt$step, levels = step_lev)
+  dt$sample_status = "none"
+  dt[start == TRUE, sample_status := "in progress"]
+  dt[start == TRUE & finish == TRUE, sample_status := "incomplete, errors"]
+  dt[start == TRUE & finish == TRUE & complete == TRUE, sample_status := "completed successfully"]
+  dt[]
+}
+
+.job_report = function(tap_out){
+  start_files = dir(tap_out, pattern = ".start$", full.names = TRUE)
+  finish_files = dir(tap_out, pattern = ".finish$", full.names = TRUE)
+  complete_files = dir(tap_out, pattern = ".complete$", full.names = TRUE)
+  dt = data.table(file = c(start_files, finish_files, complete_files))
+  dt$job_status = sapply(strsplit(basename(dt$file), "\\."), function(x)x[length(x)])
+  dt[, sample_name := sub(paste0(".", job_status), "", basename(file)), .(file)]
+  dt$present = TRUE
+  dt = dcast(dt, sample_name~job_status, value.var = "present", fill = FALSE)
+
   log_dirs = dir(tap_out, pattern = "logs$", full.names = TRUE)
   log_files = dir(log_dirs, full.names = TRUE)
-
   echo_files = log_files[grepl("echo_sub", log_files)]
   echo_files = echo_files[grepl("out$", echo_files)]
 
@@ -151,30 +174,104 @@ report_errors = function(tap_out){
     df = read.table(x, sep = "\n")
     df[nrow(df),] == "FINISHED"
   })
-  dt = data.table(out_files = out_files, finished = is_finished)
-  dt[, error_files := sub(".out$", ".error", out_files)]
-  dt[, sample_name := sub(".logs$", "", basename(dirname(out_files)))]
-  dt$job_name = sapply(strsplit(basename(dt$out_files), "\\."), function(x){
-    paste(x[-(length(x)-1):-length(x)], collapse = ".")
-  })
+  dt1 = data.table(log_file = out_files, finished = is_finished)
+  dt1[, step := sub("\\..+", "", basename(log_file))]
+  dt1[, sample_name := sub(".logs", "", basename(dirname(log_file)))]
+  dt1[, job_status := ifelse(finished, "complete", "in_progress")]
 
-  finish_files = sub(".logs$", ".finish", dirname(echo_files))
-  dt_finished = data.table(finish_files = finish_files)
-  dt_finished[, sample_name := sub(".finish", "", basename(finish_files))]
+  dt_logs = dt1[, .(log_file, step, sample_name)]
 
-  #errors are present when job output is not FINISHED but sample is finished
+  dt1 = dcast(dt1, sample_name~step, value.var = "job_status", fill = "not_started")
 
-  dt_finished = merge(dt, dt_finished, by = "sample_name")
+  dtm = merge(dt, dt1, by = "sample_name")
+  dtm = melt(dtm, id.vars = c("sample_name", "complete", "finish", 'start'), variable.name = "step", value.name = "job_status")
+  dtm[finish == TRUE & complete == FALSE & job_status == "in_progress", job_status := "error"]
 
-  dt_error = dt_finished[finished == FALSE]
+  dtm = merge(dtm, dt_logs, by = c("step", "sample_name"), all.x = TRUE)
+
+  step_lev = rev(c("STAR_align", "bsortindex", "salmon_quant", "suppa2", "exactSNP", "make_bigwigs", "sample_status"))
+  dtm$step = factor(dtm$step, levels = step_lev)
+
+  dtm[]
+}
+
+.sample_report = TAPhelpR:::.sample_report
+.job_report = TAPhelpR:::.job_report
+
+#' report_progress_plot
+#'
+#' @return Plot of job progress.
+#' @export
+#' @rdname report-output
+report_progress_plot = function(tap_out){
+  dtm = .job_report(tap_out)
+  dt = .sample_report(tap_out)
+  p_size = 8
+  p = ggplot(dtm, aes(x = sample_name, y = step)) +
+    geom_tile(aes(fill = job_status), color = "white", linewidth = 2) +
+    scale_y_discrete(drop = FALSE) +
+    geom_point(data = dt, color = "black", size = 1.2*p_size, shape = 19) +
+    geom_point(data = dt, aes(color = sample_status), size = p_size, shape = 19) +
+    scale_fill_manual(values = c("complete" = "forestgreen", "error" = "darkred", "in_progress" = "yellow2", "not_started" = "gray")) +
+    scale_color_manual(values = c("in progress" = "yellow2", "incomplete, errors" = "darkred", "completed successfully" = "forestgreen")) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),
+          panel.background = element_blank(),
+          panel.grid = element_blank()) +
+    labs(x = "", y = "")
+  p
+}
+
+
+#' report_errors
+#'
+#' @return Locate jobs that experienced errors and return relevant log files.
+#' @export
+#' @rdname report-output
+report_errors = function(tap_out){
+  dt = .job_report(tap_out)
+  dt_error = dt[job_status == "error"]
+  # log_dirs = dir(tap_out, pattern = "logs$", full.names = TRUE)
+  # log_files = dir(log_dirs, full.names = TRUE)
+  #
+  # echo_files = log_files[grepl("echo_sub", log_files)]
+  # echo_files = echo_files[grepl("out$", echo_files)]
+  #
+  # log_files = log_files[!grepl("echo_sub", log_files)]
+  # log_files = log_files[!grepl("finish", log_files)]
+  # log_files = log_files[!grepl("completion", log_files)]
+  #
+  # out_files = log_files[grepl("out$", log_files)]
+  # out_files = filter_files_for_most_recent(out_files)
+  #
+  # is_finished = sapply(out_files, function(x){
+  #   df = read.table(x, sep = "\n")
+  #   df[nrow(df),] == "FINISHED"
+  # })
+  # dt = data.table(out_files = out_files, finished = is_finished)
+  # dt[, error_files := sub(".out$", ".error", out_files)]
+  # dt[, sample_name := sub(".logs$", "", basename(dirname(out_files)))]
+  # dt$job_name = sapply(strsplit(basename(dt$out_files), "\\."), function(x){
+  #   paste(x[-(length(x)-1):-length(x)], collapse = ".")
+  # })
+  #
+  # finish_files = sub(".logs$", ".finish", dirname(echo_files))
+  # dt_finished = data.table(finish_files = finish_files)
+  # dt_finished[, sample_name := sub(".finish", "", basename(finish_files))]
+  #
+  # #errors are present when job output is not FINISHED but sample is finished
+  #
+  # dt_finished = merge(dt, dt_finished, by = "sample_name")
+
+  # dt_error = dt_finished[finished == FALSE]
   if(nrow(dt_error) == 0){
     message("No errors were detected.")
   }else{
     job_lev = c("STAR_align", "bsortindex", "salmon_quant", "suppa2", "exactSNP", "make_bigwigs")
-    dt_error$job_name = factor(dt_error$job_name, levels = job_lev)
-    table(dt_error$job_name)
-    dt_error = dt_error[order(sample_name)][order(job_name)]
-    dt_error.report = dt_error[, .(sample_name, job_name)]
+    dt_error$step = factor(dt_error$step, levels = job_lev)
+    browser()
+    table(dt_error$step)
+    dt_error = dt_error[order(sample_name)][order(step)]
+    dt_error.report = dt_error[, .(sample_name, step)]
     message("Errors were detected at the following steps:")
     print(dt_error.report)
     message(paste(collapse = "\n", c(
