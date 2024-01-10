@@ -13,6 +13,8 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE)
 
 ## Installation
 
+Installing TAP 
+
 ```{bash, eval = FALSE}
 git clone git@github.com:FrietzeLabUVM/TAP.git
 cd TAP

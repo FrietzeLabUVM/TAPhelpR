@@ -51,14 +51,17 @@ launch_UCSC_tracks_app = function(track_hosting_dir, base_host_path, base_url){
 launch_UCSC_tracks_app.UVM_galaxy = function(track_hosting_dir){
   base_host_path = "/slipstream/galaxy/production/galaxy-dist"
   if(!grepl(base_host_path, track_hosting_dir)){
-    sp = strsplit(track_hosting_dir, "/")[[1]]
-    user = sp[which(sp == "home") + 1]
-    track_hosting_dir = paste0("/slipstream/galaxy/production/galaxy-dist/static/UCSCtracks/", user, "_files")
-    if(!dir.exists(track_hosting_dir)){
-      "track_hosting_dir is not a sub-directory of base_host_path and could not convert to a UVM galaxy path."
+    track_hosting_dir = normalizePath(track_hosting_dir)
+    if(!grepl(base_host_path, track_hosting_dir)){
+      sp = strsplit(track_hosting_dir, "/")[[1]]
+      user = sp[which(sp == "home") + 1]
+      galaxy_track_dir = "/slipstream/galaxy/production/galaxy-dist/static/UCSCtracks"
+      local_path = sub(".+public_files/?", "", track_hosting_dir)
+      track_hosting_dir = file.path(galaxy_track_dir, paste0(user, "_files"), local_path)
+      if(!dir.exists(track_hosting_dir)){
+        stop("track_hosting_dir is not a sub-directory of base_host_path and could not convert to a UVM galaxy path.")
+      }
     }
-
-
   }
   launch_UCSC_tracks_app(track_hosting_dir = track_hosting_dir,
                          base_host_path,

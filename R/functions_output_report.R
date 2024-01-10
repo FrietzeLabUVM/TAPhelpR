@@ -61,58 +61,12 @@ report_completion = function(tap_out){
 #'
 #' @rdname report-output
 report_progress = function(tap_out){
-  log_dirs = dir(tap_out, pattern = "logs$", full.names = TRUE)
-  log_files = dir(log_dirs, full.names = TRUE)
-  echo_files = log_files[grepl("echo_sub", log_files)]
-  echo_files = echo_files[grepl("out$", echo_files)]
-
-  log_files = log_files[!grepl("echo_sub", log_files)]
-  log_files = log_files[!grepl("finish", log_files)]
-  log_files = log_files[!grepl("completion", log_files)]
-
-  out_files = log_files[grepl("out$", log_files)]
-  out_files = filter_files_for_most_recent(out_files)
-
-
-  is_finished = sapply(out_files, function(x){
-    df = read.table(x, sep = "\n")
-    df[nrow(df),] == "FINISHED"
-  })
-  dt1 = data.table(log_file = out_files, finished = is_finished)
-  dt1[, step := sub("\\..+", "", basename(log_file))]
-
-  finish_files = sub(".logs$", ".finish", dirname(echo_files))
-  complete_files = sub(".logs$", ".finish", dirname(echo_files))
-  dt2 = rbind(
-    data.table(log_file = echo_files, finished = file.exists(finish_files), step = "finish"),
-    data.table(log_file = echo_files, finished = file.exists(complete_files), step = "complete")
-  )
-
-  dt = rbind(dt1, dt2)
-
-  dt[, name := sub(".logs", "", basename(dirname(log_file)))]
-
-
-  step_lev = c("STAR_align", "bsortindex", "salmon_quant", "suppa2", "exactSNP", "make_bigwigs", "finish", "complete")
-  stopifnot(all(dt$step %in% step_lev))
-  dt$step = factor(dt$step, levels = step_lev)
-
-  finished_samples = dt[step == "finish"][finished == TRUE]$name
-  complete_samples = dt[step == "complete"][finished == TRUE]$name
-  finished_not_completed = setdiff(finished_samples, complete_samples)
-  if(length(finished_not_completed > 0)){
+  dt = .job_report(tap_out)
+  if(any(dt$job_status == "error")){
     warning(paste0("Some samples did not complete successfully. Use report_errors for details on errors.\n",
                    "report_errors(", tap_out, ")"))
   }
-
-  dt$step = factor(dt$step, levels = rev(step_lev))
-  ggplot(dt, aes(x = name, y = step, fill = finished)) +
-    geom_tile(color = "white", linewidth = 1.4) +
-    scale_fill_manual(values = c("FALSE" = "gray", "TRUE" = "black")) +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1), panel.background = element_blank(), panel.grid = element_blank())
-
-  dt$step = factor(dt$step, levels = step_lev)
-  mat = dcast(dt, step~name, value.var = "finished", fill = NA)
+  mat = dcast(dt, step~sample_name, value.var = "job_status", fill = NA)
   mat
 }
 
@@ -130,7 +84,7 @@ filter_files_for_most_recent = function(f){
 }
 
 .sample_report = function(tap_out){
-  step_lev = rev(c("STAR_align", "bsortindex", "salmon_quant", "suppa2", "exactSNP", "make_bigwigs", "sample_status"))
+  # step_lev = rev(c("STAR_align", "bsortindex", "salmon_quant", "suppa2", "exactSNP", "make_bigwigs", "sample_status", "finish", "complete"))
   start_files = dir(tap_out, pattern = ".start$", full.names = TRUE)
   finish_files = dir(tap_out, pattern = ".finish$", full.names = TRUE)
   complete_files = dir(tap_out, pattern = ".complete$", full.names = TRUE)
@@ -147,6 +101,8 @@ filter_files_for_most_recent = function(f){
   dt[start == TRUE & finish == TRUE & complete == TRUE, sample_status := "completed successfully"]
   dt[]
 }
+
+step_lev = c("STAR_align", "bsortindex", "salmon_quant", "suppa2", "exactSNP", "make_bigwigs", "sample_status", "finish", "complete")
 
 .job_report = function(tap_out){
   start_files = dir(tap_out, pattern = ".start$", full.names = TRUE)
@@ -174,25 +130,24 @@ filter_files_for_most_recent = function(f){
     df = read.table(x, sep = "\n")
     df[nrow(df),] == "FINISHED"
   })
-  dt1 = data.table(log_file = out_files, finished = is_finished)
-  dt1[, step := sub("\\..+", "", basename(log_file))]
-  dt1[, sample_name := sub(".logs", "", basename(dirname(log_file)))]
-  dt1[, job_status := ifelse(finished, "complete", "in_progress")]
+  dt_sample_status = data.table(log_file = out_files, finished = is_finished)
+  dt_sample_status[, step := sub("\\..+", "", basename(log_file))]
+  dt_sample_status[, sample_name := sub(".logs", "", basename(dirname(log_file)))]
+  dt_sample_status[, job_status := ifelse(finished, "complete", "in_progress")]
 
-  dt_logs = dt1[, .(log_file, step, sample_name)]
+  dt_logs = dt_sample_status[, .(log_file, step, sample_name)]
 
-  dt1 = dcast(dt1, sample_name~step, value.var = "job_status", fill = "not_started")
+  dt_sample_status = dcast(dt_sample_status, sample_name~step, value.var = "job_status", fill = "not_started")
 
-  dtm = merge(dt, dt1, by = "sample_name")
-  dtm = melt(dtm, id.vars = c("sample_name", "complete", "finish", 'start'), variable.name = "step", value.name = "job_status")
-  dtm[finish == TRUE & complete == FALSE & job_status == "in_progress", job_status := "error"]
+  dt_jobs = merge(dt, dt_sample_status, by = "sample_name")
+  dt_jobs = melt(dt_jobs, id.vars = c("sample_name", "complete", "finish", 'start'), variable.name = "step", value.name = "job_status")
+  dt_jobs[finish == TRUE & complete == FALSE & job_status == "in_progress", job_status := "error"]
 
-  dtm = merge(dtm, dt_logs, by = c("step", "sample_name"), all.x = TRUE)
+  dt_jobs = merge(dt_jobs, dt_logs, by = c("step", "sample_name"), all.x = TRUE)
 
-  step_lev = rev(c("STAR_align", "bsortindex", "salmon_quant", "suppa2", "exactSNP", "make_bigwigs", "sample_status"))
-  dtm$step = factor(dtm$step, levels = step_lev)
+  dt_jobs$step = factor(dt_jobs$step, levels = step_lev)
 
-  dtm[]
+  dt_jobs[]
 }
 
 .sample_report = TAPhelpR:::.sample_report
@@ -204,14 +159,16 @@ filter_files_for_most_recent = function(f){
 #' @export
 #' @rdname report-output
 report_progress_plot = function(tap_out){
-  dtm = .job_report(tap_out)
-  dt = .sample_report(tap_out)
+  dt_jobs = .job_report(tap_out)
+  dt_samples = .sample_report(tap_out)
+  dt_jobs$step = factor(dt_jobs$step, levels = rev(levels(dt_jobs$step)))
+  dt_samples$step = factor(dt_samples$step, levels = rev(levels(dt_samples$step)))
   p_size = 8
-  p = ggplot(dtm, aes(x = sample_name, y = step)) +
+  p = ggplot(dt_jobs, aes(x = sample_name, y = step)) +
     geom_tile(aes(fill = job_status), color = "white", linewidth = 2) +
     scale_y_discrete(drop = FALSE) +
-    geom_point(data = dt, color = "black", size = 1.2*p_size, shape = 19) +
-    geom_point(data = dt, aes(color = sample_status), size = p_size, shape = 19) +
+    geom_point(data = dt_samples, color = "black", size = 1.2*p_size, shape = 19) +
+    geom_point(data = dt_samples, aes(color = sample_status), size = p_size, shape = 19) +
     scale_fill_manual(values = c("complete" = "forestgreen", "error" = "darkred", "in_progress" = "yellow2", "not_started" = "gray")) +
     scale_color_manual(values = c("in progress" = "yellow2", "incomplete, errors" = "darkred", "completed successfully" = "forestgreen")) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),
@@ -228,47 +185,11 @@ report_progress_plot = function(tap_out){
 #' @export
 #' @rdname report-output
 report_errors = function(tap_out){
-  dt = .job_report(tap_out)
-  dt_error = dt[job_status == "error"]
-  # log_dirs = dir(tap_out, pattern = "logs$", full.names = TRUE)
-  # log_files = dir(log_dirs, full.names = TRUE)
-  #
-  # echo_files = log_files[grepl("echo_sub", log_files)]
-  # echo_files = echo_files[grepl("out$", echo_files)]
-  #
-  # log_files = log_files[!grepl("echo_sub", log_files)]
-  # log_files = log_files[!grepl("finish", log_files)]
-  # log_files = log_files[!grepl("completion", log_files)]
-  #
-  # out_files = log_files[grepl("out$", log_files)]
-  # out_files = filter_files_for_most_recent(out_files)
-  #
-  # is_finished = sapply(out_files, function(x){
-  #   df = read.table(x, sep = "\n")
-  #   df[nrow(df),] == "FINISHED"
-  # })
-  # dt = data.table(out_files = out_files, finished = is_finished)
-  # dt[, error_files := sub(".out$", ".error", out_files)]
-  # dt[, sample_name := sub(".logs$", "", basename(dirname(out_files)))]
-  # dt$job_name = sapply(strsplit(basename(dt$out_files), "\\."), function(x){
-  #   paste(x[-(length(x)-1):-length(x)], collapse = ".")
-  # })
-  #
-  # finish_files = sub(".logs$", ".finish", dirname(echo_files))
-  # dt_finished = data.table(finish_files = finish_files)
-  # dt_finished[, sample_name := sub(".finish", "", basename(finish_files))]
-  #
-  # #errors are present when job output is not FINISHED but sample is finished
-  #
-  # dt_finished = merge(dt, dt_finished, by = "sample_name")
-
-  # dt_error = dt_finished[finished == FALSE]
+  dt_jobs = .job_report(tap_out)
+  dt_error = dt_jobs[job_status == "error"]
   if(nrow(dt_error) == 0){
     message("No errors were detected.")
   }else{
-    job_lev = c("STAR_align", "bsortindex", "salmon_quant", "suppa2", "exactSNP", "make_bigwigs")
-    dt_error$step = factor(dt_error$step, levels = job_lev)
-    browser()
     table(dt_error$step)
     dt_error = dt_error[order(sample_name)][order(step)]
     dt_error.report = dt_error[, .(sample_name, step)]

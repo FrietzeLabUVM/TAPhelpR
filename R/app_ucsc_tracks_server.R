@@ -1,4 +1,7 @@
 ucsc_track_server = function(root_dir, base_host_path, base_url){
+  CFG_DIR = file.path(root_dir, ".track_configs")
+  dir.create(CFG_DIR, showWarnings = FALSE)
+
   function(input, output, session) {
     rv = reactiveValues(
       bwDF = refresh_bw(root_dir),
@@ -102,7 +105,7 @@ ucsc_track_server = function(root_dir, base_host_path, base_url){
       req(rv$trackTxt)
       tmpf = tempfile(pattern = "tracks_", tmpdir = CFG_DIR)
       write.table(rv$trackTxt, file = tmpf, quote = F, row.names = F, col.names = F)
-      tmp_url = sub(root_dir, base_url, tmpf)
+      tmp_url = sub(base_host_path, base_url, tmpf)
       tags$a(href = tmp_url, "to File", target="_blank")
     })
 
@@ -110,7 +113,7 @@ ucsc_track_server = function(root_dir, base_host_path, base_url){
       req(rv$trackTxt)
       tmpf = tempfile(pattern = "tracks_", tmpdir = CFG_DIR)
       write.table(rv$trackTxt, file = tmpf, quote = F, row.names = F, col.names = F)
-      tmp_url = sub(root_dir, base_url, tmpf)
+      tmp_url = sub(base_host_path, base_url, tmpf)
 
       ucsc_URL = "https://genome.ucsc.edu/cgi-bin/hgTracks?hgct_customText="
       tags$a(href = paste0(ucsc_URL, tmp_url), "to UCSC", target="_blank")

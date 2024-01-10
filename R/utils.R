@@ -191,7 +191,7 @@ create_matrix_from_data.table = function(exp_cnt_dt, gtf_file, name_attribute = 
                    c("gene_id")))
     )
   }
-  ref_dt = unique(data.table::data.table(gene_id = ref_gr$gene_id, gene_name = ref_gr[[name_attribute]]))
+  ref_dt = unique(data.table::data.table(gene_id = ref_gr$gene_id, gene_name = GenomicRanges::mcols(ref_gr)[[name_attribute]]))
   exp_cnt_dt.tidy = reshape2::melt(exp_cnt_dt, id.vars = "gene_id", value.name = "count", variable.name = "sample_id")
   stopifnot(all(unique(exp_cnt_dt.tidy$gene_id) %in% ref_dt$gene_id))
   #aggregate by gene_name

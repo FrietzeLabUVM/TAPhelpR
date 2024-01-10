@@ -247,15 +247,15 @@ head(mat)
 
 ```{r, load_counts_gene_name, eval=FALSE}
 #if you supply the reference gtf file, or GRanges of same, to load_counts, gene_ids in counts will be aggregated to gene_name
-mat.gene_name = load_counts(tap_out, gtf_file = file.path(example_honeybee_reference(), "GTF/current.gtf"))
+mat.gene_name = load_counts(tap_out, gtf_file = file.path(example_honeybee_reference(), "GTF/current.gtf"), name_attribute = "gene")
 ```
 
 ```{r deseq2}
 library(DESeq2)
 meta_df = bam_files
 meta_df$file = NULL
-meta_df = dplyr::mutate(meta_df, name = paste(day, sex, rep, sep = "_"))
-des = DESeqDataSetFromMatrix(mat[, meta_df$name], colData = meta_df, design = ~sex)
+meta_df = dplyr::mutate(meta_df, name = paste(species, day, role, rep, sep = "_"))
+des = DESeqDataSetFromMatrix(mat[, meta_df$name], colData = meta_df, design = ~role)
 # and run from there ...
 ```
 
@@ -270,3 +270,7 @@ stage_output_for_UCSC_tracks(tap_out, track_hosting_dir = "~/public_files/honeyb
 ```
 
 launch shiny app
+
+```{r, eval=FALSE}
+launch_UCSC_tracks_app.UVM_galaxy(track_hosting_dir = "~/public_files/honeybee")
+```
