@@ -36,7 +36,6 @@ if(!require("devtools")){
 # It is only required to download data from ENCODE.
 devtools::install_github("CharlesJB/ENCODExplorer")
 devtools::install_github("FrietzeLabUVM/TAPhelpR")
-
 ```
 
 ```{r}
@@ -191,6 +190,19 @@ For a more detailed report of progress, use `report_progress`. You'll receive a 
 ```{r}
 report_progress(tap_out)
 ```
+
+Status plots for a complete run look like this:
+
+```{r}
+report_progress_plot(tap_out)
+```
+
+If there are errors or jobs still in progress you'll see something like this:
+
+```{r}
+report_progress_plot(example_honeybee_output.in_progress())
+```
+
 Finally, if there were errors, use `report_errors`.
 
 ```{r report_errors}
@@ -262,7 +274,7 @@ des = DESeqDataSetFromMatrix(mat[, meta_df$name], colData = meta_df, design = ~r
 ## UCSC tracks
 
 ```{r, ucsc}
-stage_output_for_UCSC_tracks(tap_out, track_hosting_dir = "~/public_files/honeybee")
+stage_output_for_UCSC_tracks(tap_out, track_hosting_dir = "~/public_files/honeybee", overwrite = TRUE)
 "~/public_files/honeybee" %>% 
   dir(full.names = TRUE) %>% 
   dir(full.names = TRUE) %>% 
