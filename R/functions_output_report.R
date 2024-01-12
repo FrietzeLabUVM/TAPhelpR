@@ -61,12 +61,12 @@ report_completion = function(tap_out){
 #'
 #' @rdname report-output
 report_progress = function(tap_out){
-  dt = .job_report(tap_out)
-  if(any(dt$job_status == "error")){
+  dt_jobs = .job_report(tap_out)
+  if(any(dt_jobs$job_status == "error")){
     warning(paste0("Some samples did not complete successfully. Use report_errors for details on errors.\n",
                    "report_errors(", tap_out, ")"))
   }
-  mat = dcast(dt, step~sample_name, value.var = "job_status", fill = NA)
+  mat = dcast(dt_jobs, step~sample_name, value.var = "job_status", fill = NA)
   mat
 }
 
@@ -84,35 +84,41 @@ filter_files_for_most_recent = function(f){
 }
 
 .sample_report = function(tap_out){
-  # step_lev = rev(c("STAR_align", "bsortindex", "salmon_quant", "suppa2", "exactSNP", "make_bigwigs", "sample_status", "finish", "complete"))
   start_files = dir(tap_out, pattern = ".start$", full.names = TRUE)
   finish_files = dir(tap_out, pattern = ".finish$", full.names = TRUE)
   complete_files = dir(tap_out, pattern = ".complete$", full.names = TRUE)
-  dt = data.table(file = c(start_files, finish_files, complete_files))
-  dt$job_status = sapply(strsplit(basename(dt$file), "\\."), function(x)x[length(x)])
-  dt[, sample_name := sub(paste0(".", job_status), "", basename(file)), .(file)]
-  dt$present = TRUE
-  dt = dcast(dt, sample_name~job_status, value.var = "present", fill = FALSE)
-  dt$step = "sample_status"
-  dt$step = factor(dt$step, levels = step_lev)
-  dt$sample_status = "none"
-  dt[start == TRUE, sample_status := "in progress"]
-  dt[start == TRUE & finish == TRUE, sample_status := "incomplete, errors"]
-  dt[start == TRUE & finish == TRUE & complete == TRUE, sample_status := "completed successfully"]
-  dt[]
+  dt_pipeline_status = data.table(file = c(start_files, finish_files, complete_files))
+  dt_pipeline_status$job_status = sapply(strsplit(basename(dt_pipeline_status$file), "\\."), function(x)x[length(x)])
+  dt_pipeline_status[, sample_name := sub(paste0(".", job_status), "", basename(file)), .(file)]
+  dt_pipeline_status$present = TRUE
+  dt_pipeline_status$job_status = factor(dt_pipeline_status$job_status, levels = c("start", "finish", "complete"))
+  dt_pipeline_status = dcast(dt_pipeline_status, sample_name~job_status, value.var = "present", fill = FALSE, drop = FALSE)
+  dt_pipeline_status$step = "sample_status"
+  dt_pipeline_status$step = factor(dt_pipeline_status$step, levels = step_lev)
+  dt_pipeline_status$sample_status = "none"
+  dt_pipeline_status[start == TRUE, sample_status := "in progress"]
+  dt_pipeline_status[start == TRUE & finish == TRUE, sample_status := "incomplete, errors"]
+  dt_pipeline_status[start == TRUE & finish == TRUE & complete == TRUE, sample_status := "completed successfully"]
+  dt_pipeline_status[]
 }
 
-step_lev = c("STAR_align", "bsortindex", "salmon_quant", "suppa2", "exactSNP", "make_bigwigs", "sample_status", "finish", "complete")
+# step_lev = c("STAR_align", "bsortindex", "salmon_quant", "suppa2", "exactSNP", "make_bigwigs", "finish", "complete", "sample_status")
+step_lev = c("STAR_align", "bsortindex", "salmon_quant", "suppa2", "exactSNP", "make_bigwigs", "sample_status")
+# step_lev.main = setdiff(step_lev, c("finish", "complete"))
 
 .job_report = function(tap_out){
   start_files = dir(tap_out, pattern = ".start$", full.names = TRUE)
   finish_files = dir(tap_out, pattern = ".finish$", full.names = TRUE)
   complete_files = dir(tap_out, pattern = ".complete$", full.names = TRUE)
-  dt = data.table(file = c(start_files, finish_files, complete_files))
-  dt$job_status = sapply(strsplit(basename(dt$file), "\\."), function(x)x[length(x)])
-  dt[, sample_name := sub(paste0(".", job_status), "", basename(file)), .(file)]
-  dt$present = TRUE
-  dt = dcast(dt, sample_name~job_status, value.var = "present", fill = FALSE)
+  dt_pipeline_status = data.table(file = c(start_files, finish_files, complete_files))
+  dt_pipeline_status$job_status = sapply(strsplit(basename(dt_pipeline_status$file), "\\."), function(x)x[length(x)])
+  dt_pipeline_status[, sample_name := sub(paste0(".", job_status), "", basename(file)), .(file)]
+  dt_pipeline_status$present = TRUE
+  dt_pipeline_status$job_status = factor(dt_pipeline_status$job_status, levels = c("start", "finish", "complete"))
+  sample_lev = unique(dt_pipeline_status$sample_name)
+  dt_pipeline_status = dcast(dt_pipeline_status, sample_name~job_status, value.var = "present", fill = FALSE, drop = FALSE)
+
+
 
   log_dirs = dir(tap_out, pattern = "logs$", full.names = TRUE)
   log_files = dir(log_dirs, full.names = TRUE)
@@ -139,13 +145,14 @@ step_lev = c("STAR_align", "bsortindex", "salmon_quant", "suppa2", "exactSNP", "
 
   dt_sample_status = dcast(dt_sample_status, sample_name~step, value.var = "job_status", fill = "not_started")
 
-  dt_jobs = merge(dt, dt_sample_status, by = "sample_name")
+  dt_jobs = merge(dt_sample_status, dt_pipeline_status, by = "sample_name")
   dt_jobs = melt(dt_jobs, id.vars = c("sample_name", "complete", "finish", 'start'), variable.name = "step", value.name = "job_status")
   dt_jobs[finish == TRUE & complete == FALSE & job_status == "in_progress", job_status := "error"]
 
   dt_jobs = merge(dt_jobs, dt_logs, by = c("step", "sample_name"), all.x = TRUE)
 
   dt_jobs$step = factor(dt_jobs$step, levels = step_lev)
+  dt_jobs$sample_name = factor(dt_jobs$sample_name, levels = sample_lev)
 
   dt_jobs[]
 }
@@ -163,14 +170,18 @@ report_progress_plot = function(tap_out){
   dt_samples = .sample_report(tap_out)
   dt_jobs$step = factor(dt_jobs$step, levels = rev(levels(dt_jobs$step)))
   dt_samples$step = factor(dt_samples$step, levels = rev(levels(dt_samples$step)))
+
+  dt_jobs$job_status = factor(dt_jobs$job_status, levels = c("not_started", "error", "in_progress", "complete"))
+  dt_samples$sample_status = factor(dt_samples$sample_status, levels = c("incomplete, errors", "in progress", "completed successfully"))
+
   p_size = 8
   p = ggplot(dt_jobs, aes(x = sample_name, y = step)) +
     geom_tile(aes(fill = job_status), color = "white", linewidth = 2) +
     scale_y_discrete(drop = FALSE) +
     geom_point(data = dt_samples, color = "black", size = 1.2*p_size, shape = 19) +
     geom_point(data = dt_samples, aes(color = sample_status), size = p_size, shape = 19) +
-    scale_fill_manual(values = c("complete" = "forestgreen", "error" = "darkred", "in_progress" = "yellow2", "not_started" = "gray")) +
-    scale_color_manual(values = c("in progress" = "yellow2", "incomplete, errors" = "darkred", "completed successfully" = "forestgreen")) +
+    scale_fill_manual(values = c("complete" = "forestgreen", "error" = "darkred", "in_progress" = "yellow2", "not_started" = "gray"), drop = FALSE) +
+    scale_color_manual(values = c("in progress" = "yellow2", "incomplete, errors" = "darkred", "completed successfully" = "forestgreen"), drop = FALSE) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),
           panel.background = element_blank(),
           panel.grid = element_blank()) +

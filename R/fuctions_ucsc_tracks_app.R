@@ -82,13 +82,15 @@ launch_UCSC_tracks_app.UVM_galaxy = function(track_hosting_dir){
 #' @param track_hosting_dir The directory where track files are available via a
 #'   public URL. To conveniently place pipeline outputs in a public location,
 #'   use the [stage_output_for_UCSC_tracks] function.
+#' @param overwrite Should files already present in `track_hosting_dir` be overwritten? Default is FALSE.
 #'
 #' @return `track_hosting_dir` is invisibly returned.
 #' @export
 #'
 #' @examples
 #' stage_output_for_UCSC_tracks("~/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output", "~/public_files/honeybee_tracks")
-stage_output_for_UCSC_tracks = function(pipeline_outputs_dir, track_hosting_dir){
+stage_output_for_UCSC_tracks = function(pipeline_outputs_dir, track_hosting_dir, overwrite = FALSE){
+  pipeline_outputs_dir = pipeline_outputs_dir
   bw_outs = dir(pipeline_outputs_dir, pattern = "bigwigs$", full.names = TRUE)
   bw_files.fe = dir(pipeline_outputs_dir, pattern = "FE.bw$", full.names = TRUE)
   bw_files.reads = dir(bw_outs, pattern = ".bw$", full.names = TRUE)
@@ -125,8 +127,16 @@ stage_output_for_UCSC_tracks = function(pipeline_outputs_dir, track_hosting_dir)
     group = bw_df$group[i]
     dest_dir = file.path(track_hosting_dir, group)
     dir.create(dest_dir, showWarnings = FALSE, recursive = TRUE)
-    if(!file.exists(file.path(dest_dir, basename(f)))){
-      file.symlink(f, file.path(dest_dir, basename(f)))
+    dest_file = file.path(dest_dir, basename(f))
+    if(overwrite){
+      if(file.exists(dest_file) | symlink.exists(dest_file)){
+        file.remove(dest_file)
+      }
+    }
+    if(!file.exists(dest_file) & !symlink.exists(dest_file)){
+      file.symlink(normalizePath(f), dest_file)
+    }else{
+      warning("cannot overwrite destination file:", dest_file)
     }
   }
   invisible(track_hosting_dir)

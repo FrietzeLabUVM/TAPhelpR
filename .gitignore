@@ -14,3 +14,9 @@ ENCFF791NEQ.fastq.gz
 suppa2_diff
 suppa2_output
 *.csv
+indexes
+input_fastq
+ncbi_dataset
+ncbi_dataset.zip
+fasterq_*
+output_TAP

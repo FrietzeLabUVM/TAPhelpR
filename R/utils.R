@@ -176,7 +176,7 @@ create_matrix_from_data.table = function(exp_cnt_dt, gtf_file, name_attribute = 
   #### convert to gene_name ####
   if(is.character(gtf_file)){
     message("loading gtf...")
-    ref_gr = rtracklayer::import.gff(gtf_file, feature.type = "gene")
+    ref_gr = .load_ref(gtf_file, "gene")
   }else{
     ref_gr = gtf_file
   }
@@ -223,4 +223,10 @@ calc_log2_FC_per_gene = function(x, value_var = NULL, A_cols = NULL, B_cols = NU
   if(is.null(B_name)) B_name = paste(B_cols, collapse = "&")
   FC_name = paste0("from_", A_name, "_to_", B_name)
 
+}
+
+symlink.exists = function(f){
+  test_val = Sys.readlink(f)
+  if(is.na(test_val)) return(FALSE)
+  test_val != ""
 }

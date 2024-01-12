@@ -30,7 +30,7 @@ while [[ "$#" -gt 0 ]]; do
         -o|--outdir) fetch_path="$2"; shift ;;
         -n|--ncores) ncores="$2"; shift ;;
         -docker|--docker) container="$2"; container_type="docker"; shift ;;
-        -singularity|--singularity) container="$2"; container_type="singularity"; shift ;; 
+        -singularity|--singularity) container="$2"; container_type="singularity"; shift ;;
         -h|--help) echo -e "$usage"; exit 0 ;;
         *) echo "Unknown parameter passed: $1"; exit 1 ;;
     esac
@@ -52,6 +52,7 @@ echo prefix is "$root"
 echo fetch_path is "$fetch_path"
 
 mkdir -p "$fetch_path"
+fetch_path=$(readlink -f $fetch_path)
 cd "$fetch_path" || exit
 
 #dl_fq1=${fetch_path}/${srr}".sra_1.fastq"
@@ -65,7 +66,7 @@ if [ -n "$container_type" ]; then
   echo container is "$container"
   d_fetch_path=/workdir
   echo "$container_type" fetch_path is "$d_fetch_path"
-  
+
   if [ "$container_type" = "docker" ]; then
     dock_base_cmd="docker run \
       -u $(id -u):$(id -g) \
@@ -91,8 +92,8 @@ else
   pigz_cmd=pigz
 fi
 
-dl_fq1=${fetch_path}/${srr}".1.fastq"
-dl_fq2=${fetch_path}/${srr}".2.fastq"
+dl_fq1=${fetch_path}/${srr}"_1.fastq"
+dl_fq2=${fetch_path}/${srr}"_2.fastq"
 dl_fqse=${fetch_path}/${srr}".fastq"
 
 fq1=${fetch_path}/${root}"_R1_001.fastq"
@@ -119,6 +120,7 @@ fi
 if [ -d "${fetch_path}"/"${srr}" ]; then
   echo found prefetch for "$srr", will not rerun prefetch.;
 else
+  echo prefetch...
   $prefetch_cmd --max-size 500G -O "$d_fetch_path"  "$srr"
 fi
 
@@ -128,27 +130,45 @@ else
   if [ -f "${dl_fqse}" ]; then
     echo found dumped fastq, will not rerun fasterq-dump.
   else
+    echo dump...
     $fasterq_cmd -O "$d_fetch_path" --split-3 "${d_fetch_path}"/"${srr}"/"${srr}".sra --threads "$ncores" -t "${d_fetch_path}"
   fi
 fi
 
+if [ -f "${dl_fq1}" ] && [ -f "${dl_fq2}" ]; then
+  echo dump has finished
+else
+  if [ -f "${dl_fqse}" ]; then
+    echo dump has finished
+  else
+    echo issue with dump results expect to find either SE or PE outputs
+    echo "PE: ${dl_fq1} and ${dl_fq2}"
+    echo "SE: ${dl_fqse}"
+    exit 1
+  fi
+fi
+
 if [ -f "${d_fetch_path}"/"${srr}"/"${srr}".sra ]; then
+  echo cleaning up prefetch...
   rm -r "${fetch_path:?}"/"${srr:?}"
 fi
 
 if [ -f "${dl_fq1}" ]; then
+  echo gzipping PE R1...
   mv "${dl_fq1}" "${fq1}"
   $pigz_cmd -p "$ncores" "${d_fq1}"
   echo "${fq1}".gz finised!
 fi
 
 if [ -f "${dl_fq2}" ]; then
+  echo gzipping PE R2...
   mv "${dl_fq2}" "${fq2}"
   $pigz_cmd -p "$ncores" "${d_fq2}"
   echo "${fq2}".gz finised!
 fi
 
 if [ -f "${dl_fqse}" ]; then
+  echo gzipping SE R1...
   mv "${dl_fqse}" "${fqse}"
   $pigz_cmd -p "$ncores" "${d_fqse}"
   echo "${fqse}".gz finised!

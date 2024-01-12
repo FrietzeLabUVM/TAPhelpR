@@ -270,7 +270,7 @@ GEO_download_files = function(srr_tofetch,
     if(!is.null(singularity)){
       cmd_args = paste(cmd_args, "--singularity", singularity)
     }
-    cmd = paste("sbatch", dump_script, cmd_args)
+    cmd = paste(dump_script, cmd_args)
     all_cmds = c(all_cmds, cmd)
   }
   all_cmds
