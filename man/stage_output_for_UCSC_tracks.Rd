@@ -4,7 +4,11 @@
 \alias{stage_output_for_UCSC_tracks}
 \title{stage_output_for_UCSC_tracks}
 \usage{
-stage_output_for_UCSC_tracks(pipeline_outputs_dir, track_hosting_dir)
+stage_output_for_UCSC_tracks(
+  pipeline_outputs_dir,
+  track_hosting_dir,
+  overwrite = FALSE
+)
 }
 \arguments{
 \item{pipeline_outputs_dir}{The directory where completed TAP outputs are
@@ -13,6 +17,8 @@ located.}
 \item{track_hosting_dir}{The directory where track files are available via a
 public URL. To conveniently place pipeline outputs in a public location,
 use the \link{stage_output_for_UCSC_tracks} function.}
+
+\item{overwrite}{Should files already present in \code{track_hosting_dir} be overwritten? Default is FALSE.}
 }
 \value{
 \code{track_hosting_dir} is invisibly returned.

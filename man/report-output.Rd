@@ -37,7 +37,13 @@ report_progress_plot
 report_errors
 }
 \examples{
-tap_out = "~/R_workspace.combined/TAPhelpR.data/honeybee_TAP_output.rename"
+tap_out = example_honeybee_output()
+report_completion(tap_out)
+report_progress(tap_out)
+report_progress_plot(tap_out)
+report_errors(tap_out)
+
+tap_out = example_honeybee_output.in_progress()
 report_completion(tap_out)
 report_progress(tap_out)
 report_progress_plot(tap_out)

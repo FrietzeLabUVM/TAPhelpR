@@ -256,3 +256,22 @@ load_gene_reference = function(gtf_file){
 load_exon_reference = function(gtf_file){
   .load_ref(gtf_file, "exon")
 }
+
+#' load_transcript_reference
+#'
+#' Loads transcript reference from the same .gtf file used to run TAP.
+#'
+#' This loads all transcript entries. Use [load_gene_reference] if you only need basic gene information or [load_exon] reference for more detail.
+#'
+#' @return A GRanges object with exonic information.
+#' @export
+#'
+#' @examples
+#' ref_dir = example_honeybee_reference()
+#' gtf_file = file.path(ref_dir, "GTF/current.gtf")
+#' load_transcript_reference(gtf_file)
+#' # for simplicity you can just specify the base path to the reference used to run TAP.
+#' load_transcript_reference(ref_dir)
+load_transcript_reference = function(gtf_file){
+  .load_ref(gtf_file, "transcript")
+}
