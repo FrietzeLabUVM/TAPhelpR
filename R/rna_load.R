@@ -221,7 +221,9 @@ load_norm_counts = function(work_dir, library_type = NULL, name_composition = NU
 #' # for simplicity you can just specify the base path to the reference used to run TAP.
 #' load_gene_reference(ref_dir)
 load_gene_reference = function(gtf_file){
-  .load_ref(gtf_file, "gene")
+  ref_gr = .load_ref(gtf_file, "gene")
+  names(ref_gr) = ref_gr$gene_id
+  ref_gr
 }
 
 .load_ref = function(gtf_file, feature_type){
@@ -234,7 +236,6 @@ load_gene_reference = function(gtf_file){
     stop("gtf_file could not be found. Use the same reference directory used to run TAP or the gtf located at GTF/current.gtf in that same reference.")
   }
   ref_gr = rtracklayer::import.gff(gtf_file, feature.type = feature_type)
-  names(ref_gr) = ref_gr$gene_id
   ref_gr
 }
 
@@ -254,7 +255,9 @@ load_gene_reference = function(gtf_file){
 #' # for simplicity you can just specify the base path to the reference used to run TAP.
 #' load_exon_reference(ref_dir)
 load_exon_reference = function(gtf_file){
-  .load_ref(gtf_file, "exon")
+  ref_gr = .load_ref(gtf_file, "exon")
+  names(ref_gr) = ref_gr$exon_id
+  ref_gr
 }
 
 #' load_transcript_reference
@@ -273,5 +276,7 @@ load_exon_reference = function(gtf_file){
 #' # for simplicity you can just specify the base path to the reference used to run TAP.
 #' load_transcript_reference(ref_dir)
 load_transcript_reference = function(gtf_file){
-  .load_ref(gtf_file, "transcript")
+  ref_gr = .load_ref(gtf_file, "transcript")
+  names(ref_gr) = ref_gr$transcript_id
+  ref_gr
 }
