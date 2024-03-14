@@ -103,7 +103,7 @@ filter_files_for_most_recent = function(f){
 }
 
 # step_lev = c("STAR_align", "bsortindex", "salmon_quant", "suppa2", "exactSNP", "make_bigwigs", "finish", "complete", "sample_status")
-step_lev = c("STAR_align", "bsortindex", "salmon_quant", "suppa2", "exactSNP", "make_bigwigs", "sample_status")
+step_lev = c("STAR_rDNA", "STAR_align", "bsortindex", "salmon_quant", "suppa2", "exactSNP", "make_bigwigs", "sample_status")
 # step_lev.main = setdiff(step_lev, c("finish", "complete"))
 
 .job_report = function(tap_out){
