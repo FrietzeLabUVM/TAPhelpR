@@ -1,7 +1,7 @@
 Package: TAPhelpR
 Type: Package
 Title: helpers for TAP pipeline outputs
-Version: 0.1.9
+Version: 0.1.10
 Authors@R: person("Joseph R", "Boyd", email = "jrboyd@uvm.edu",
                   role = c("aut", "cre"))
 Description: Functions to make use of TAP pipeline outputs
@@ -13,7 +13,9 @@ Depends:
   data.table
 Imports: 
   colourpicker,
+  curl,
   DT,
+  ENCODExplorer,
   GenomicRanges,
   IRanges,
   openxlsx,
