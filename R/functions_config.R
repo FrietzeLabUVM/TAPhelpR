@@ -182,10 +182,8 @@ parse_head_str = function(head_str){
   header_args = get_header_args()
   parsed_args = list()
   for(v_arg in names(header_args$value_args)){
-    # message(v_arg)
     possible_keys = header_args$value_args[[v_arg]]
     for(v_key in possible_keys){
-      # arg_match = grepl(v_key, head_args)
       arg_match = v_key == head_args
       if(any(arg_match)){
         if(is.null(parsed_args[[v_arg]])){
@@ -203,7 +201,7 @@ parse_head_str = function(head_str){
     # message(f_arg)
     possible_keys = header_args$flag_args[[f_arg]]
     for(v_key in possible_keys){
-      arg_match = grepl(v_key, head_args)
+      arg_match = v_key == head_args
       if(any(arg_match)){
         if(is.null(parsed_args[[f_arg]])){
           # value follows key by one position
